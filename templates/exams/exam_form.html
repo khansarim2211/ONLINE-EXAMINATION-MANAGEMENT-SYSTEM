@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 850px; margin: 2rem auto 4rem;">
+    <!-- Stylish Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1.5rem;">
+        <div>
+            <h2 style="margin: 0; color: #4338ca; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px;">
+                {% if form.instance.pk %}Edit Exam Settings{% else %}Create New Exam{% endif %}
+            </h2>
+            <p style="margin: 0; color: #64748b; font-size: 0.95rem; font-weight: 500; margin-top: 0.3rem;">Define parameters, timing, and randomized question logic for this assessment.</p>
+        </div>
+        <a href="{% url 'teacher_dashboard' %}" class="btn-back-hub" style="font-size: 0.85rem; padding: 0.6rem 1.2rem;">
+            ← Home Dashboard
+        </a>
+    </div>
+
+    <!-- Main Glass Panel -->
+    <div class="glass-panel" style="padding: 2.5rem 3rem; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.04); border: 1.5px solid #f1f5f9;">
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Course -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="premium-label">COURSE <span style="color: #ef4444;">*</span></label>
+                    {{ form.course }}
+                    {% if form.course.errors %}<div class="error-msg">{{ form.course.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <!-- Title -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="premium-label">TITLE <span style="color: #ef4444;">*</span></label>
+                    <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" class="form-control" placeholder="Unit Test 1 - Data Structures" required>
+                    {% if form.title.errors %}<div class="error-msg">{{ form.title.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <!-- Total Marks & Duration -->
+                <div class="form-group">
+                    <label class="premium-label">TOTAL MARKS <span style="color: #ef4444;">*</span></label>
+                    <input type="number" name="total_marks" id="id_total_marks" value="{{ form.total_marks.value|default:'50' }}" class="form-control" required>
+                    {% if form.total_marks.errors %}<div class="error-msg">{{ form.total_marks.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="premium-label">DURATION MINUTES <span style="color: #ef4444;">*</span></label>
+                    <input type="number" name="duration_minutes" id="id_duration_minutes" value="{{ form.duration_minutes.value|default:'60' }}" class="form-control" required>
+                    {% if form.duration_minutes.errors %}<div class="error-msg">{{ form.duration_minutes.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <!-- Date & Negative Marks -->
+                <div class="form-group">
+                    <label class="premium-label">SCHEDULED DATE</label>
+                    <input type="datetime-local" name="scheduled_date" id="id_scheduled_date" value="{{ form.scheduled_date.value|date:'Y-m-d\TH:i' }}" class="form-control">
+                    {% if form.scheduled_date.errors %}<div class="error-msg">{{ form.scheduled_date.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="premium-label">NEGATIVE MARKS <span style="color: #ef4444;">*</span></label>
+                    <input type="number" step="0.01" name="negative_marks" id="id_negative_marks" value="{{ form.negative_marks.value|default:'0.0' }}" class="form-control" required>
+                    <div class="help-text"><i class="fa-solid fa-circle-info"></i> Deduction per error (e.g. 0.25)</div>
+                    {% if form.negative_marks.errors %}<div class="error-msg">{{ form.negative_marks.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <!-- Question Select Limit -->
+                <div class="form-group">
+                    <label class="premium-label">QUESTION SELECT LIMIT</label>
+                    {{ form.random_question_count }}
+                    <div class="help-text"><i class="fa-solid fa-shuffle" style="color: #10b981;"></i> Selects 15 or 20 random questions for each attempt.</div>
+                    {% if form.random_question_count.errors %}<div class="error-msg">{{ form.random_question_count.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <!-- Options Row -->
+                <div class="form-group" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; background: #f0fdf4; padding: 1.5rem; border-radius: 20px; border: 1px solid #dcfce7;">
+                    <div>
+                        <label class="premium-label" style="color: #065f46;">SHUFFLE QUESTIONS</label>
+                        <div style="display: flex; align-items: center; gap: 0.8rem;">
+                            {{ form.shuffle_questions }}
+                            <span style="color: #065f46; font-weight: 700; font-size: 0.85rem;">Random order per student</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="premium-label" style="color: #065f46;">RE-ATTEMPT SECTION</label>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                {{ form.allow_reattempt }}
+                                <span style="color: #065f46; font-weight: 700; font-size: 0.85rem;">Allow student re-attempts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="premium-label">INSTRUCTIONS</label>
+                    {{ form.instructions }}
+                    {% if form.instructions.errors %}<div class="error-msg">{{ form.instructions.errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1.5px solid #f1f5f9;">
+                <button type="submit" class="btn-submit-premium" style="background: linear-gradient(135deg, #059669, #10b981);">
+                    <i class="fa-solid fa-check-double"></i> {% if form.instance.pk %}Update Examination Data{% else %}Finalize & Create Exam{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .btn-back-hub {
+        background: white;
+        color: #1e293b;
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 700;
+        border: 1.5px solid #e2e8f0;
+        transition: all 0.3s;
+        font-size: 0.95rem;
+    }
+    .btn-back-hub:hover { border-color: #4338ca; color: #4338ca; transform: translateX(-5px); }
+
+    .premium-label {
+        display: block;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 0.8rem;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control {
+        background: #f8fafc;
+        border: 2px solid #f1f5f9;
+        border-radius: 15px;
+        padding: 1rem 1.5rem;
+        transition: all 0.3s;
+        font-family: inherit;
+        font-size: 1.05rem;
+        color: #1e293b;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .form-control:focus {
+        background: white;
+        border-color: #6366f1;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.08);
+        outline: none;
+    }
+
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234338ca'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1.5rem center;
+        background-size: 1.2rem;
+    }
+
+    .help-text { font-size: 0.85rem; color: #94a3b8; margin-top: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .error-msg { color: #ef4444; font-size: 0.9rem; margin-top: 0.6rem; font-weight: 700; }
+
+    #id_shuffle_questions {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        border: 2px solid #e2e8f0;
+        cursor: pointer;
+        accent-color: #6366f1;
+    }
+
+    .btn-submit-premium {
+        width: 100%;
+        background: linear-gradient(135deg, #4f46e5, #4338ca);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+        border-radius: 20px;
+        font-size: 1.3rem;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.25);
+    }
+    .btn-submit-premium:hover { transform: translateY(-3px); box-shadow: 0 25px 50px rgba(79, 70, 229, 0.35); filter: brightness(1.1); }
+</style>
+{% endblock %}

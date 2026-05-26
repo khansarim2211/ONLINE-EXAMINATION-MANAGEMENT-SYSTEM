@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+    // Force navbar removal for this specific page
+    document.addEventListener('DOMContentLoaded', function() {
+        const nav = document.querySelector('.navbar');
+        const footer = document.querySelector('footer');
+        if (nav) nav.style.display = 'none';
+        if (footer) footer.style.display = 'none';
+        
+        // Also remove padding from main container
+        const main = document.querySelector('.main-container');
+        if (main) {
+            main.style.padding = '0';
+            main.style.maxWidth = '100%';
+        }
+    });
+</script>
+<div id="entranceSection" style="max-width: 750px; margin: 3rem auto; padding: 0 1rem;">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+        <div style="background: #a855f7; color: white; width: 45px; height: 45px; border-radius: 10px; display: inline-flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: 900; box-shadow: 0 8px 16px rgba(168, 85, 247, 0.3); margin-bottom: 1.5rem;">E</div>
+        <h1 style="font-size: 1.6rem; font-weight: 850; color: #1e293b; margin-bottom: 0.25rem; letter-spacing: -0.5px;">Assessment Entrance</h1>
+
+        <p style="color: #64748b; font-size: 1rem; font-weight: 500;">{{ exam.title }}</p>
+    </div>
+
+    <!-- Instruction Cards Grid (Compact) -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
+        <div class="instr-card" style="padding: 1.2rem;">
+            <span class="instr-num">01. FORMAT</span>
+            <p style="font-size: 0.85rem;"><strong>{{ questions|length }} questions</strong> • <strong>{{ exam.duration_minutes }}m</strong> duration.</p>
+        </div>
+        <div class="instr-card" style="padding: 1.2rem;">
+            <span class="instr-num">02. PROCTORING</span>
+            <p style="font-size: 0.85rem;">Strict full-screen. No tab switching.</p>
+        </div>
+        <div class="instr-card" style="padding: 1.2rem;">
+            <span class="instr-num">03. PROGRESS</span>
+            <p style="font-size: 0.85rem;">Auto-save active. Review before end.</p>
+        </div>
+        <div class="instr-card" style="padding: 1.2rem;">
+            <span class="instr-num">04. MARKING</span>
+            <p style="font-size: 0.85rem;">Negative marking: <strong>{{ exam.negative_marks }}</strong> per error.</p>
+        </div>
+    </div>
+
+    <!-- Confirmation and Action -->
+    <div style="text-align: center;">
+        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
+            <input type="checkbox" id="understandCheckbox" style="width: 18px; height: 18px; cursor: pointer;">
+            <label for="understandCheckbox" style="color: #475569; font-weight: 700; font-size: 0.9rem; cursor: pointer;">I understand and agree to the rules</label>
+        </div>
+        <button id="startExamBtn" class="btn-enter" disabled style="padding: 0.8rem 2.5rem; font-size: 0.95rem;">
+
+            Start Examination 🚀
+        </button>
+    </div>
+</div>
+
+<!-- Actual Exam Section (Hidden Initially) -->
+<div id="examSection" style="display: none; max-width: 900px; margin: 1.5rem auto; padding: 0 1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: white; padding: 1rem 1.5rem; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 20px; z-index: 100;">
+        <div>
+            <h2 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #1e293b;">{{ exam.title }}</h2>
+
+            <span style="color: #94a3b8; font-weight: 600; font-size: 0.8rem;">ID: #EX{{ exam.id|stringformat:"04d" }}</span>
+        </div>
+        <div style="text-align: right;">
+            <div id="timer" style="font-size: 1.3rem; font-weight: 900; color: #ef4444; font-family: monospace;">{{ exam.duration_minutes }}:00</div>
+
+            <span style="font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Time Left</span>
+        </div>
+    </div>
+
+    <form id="examForm" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="violations" id="violationCount" value="0">
+        <input type="hidden" name="rendered_question_ids" value="{% for q in questions %}{{ q.id }}{% if not forloop.last %},{% endif %}{% endfor %}">
+        
+        {% for q in questions %}
+        <div class="question-card" style="padding: 1.5rem;">
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.2rem;">
+                <span style="background: #f1f5f9; color: #475569; padding: 0.3rem 1rem; border-radius: 50px; font-weight: 800; font-size: 0.75rem;">Question {{ forloop.counter }}</span>
+                <span style="color: #94a3b8; font-weight: 700; font-size: 0.8rem;">Points: {{ q.marks }}</span>
+            </div>
+            <p style="font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 1.5rem; line-height: 1.5;">{{ q.text }}</p>
+
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                {% for choice in q.choices.all %}
+                <label class="choice-container" style="padding: 1rem;">
+                    <input type="radio" name="question_{{ q.id }}" value="{{ choice.id }}">
+                    <span class="choice-checkmark"></span>
+                    <span class="choice-text" style="font-size: 0.9rem;">{{ choice.text }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div style="text-align: center; margin: 3rem 0;">
+            <button type="button" onclick="showSubmissionModal()" class="btn-submit-exam" style="padding: 0.8rem 2.5rem; font-size: 0.95rem;">
+
+                Finalize Submission
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- FULL SCREEN PROMPT MODAL -->
+<div id="fullscreenPromptModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); z-index: 3000; justify-content: center; align-items: center; padding: 2rem;">
+    <div style="background: white; border-radius: 35px; width: 100%; max-width: 480px; padding: 3.5rem 3rem; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: modalIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div style="width: 85px; height: 85px; background: #eff6ff; color: #2563eb; border-radius: 24px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin: 0 auto 2rem; transform: rotate(-10deg);">
+            <i class="fa-solid fa-expand"></i>
+        </div>
+        <h2 style="font-size: 1.5rem; font-weight: 850; color: #1e293b; margin-bottom: 0.8rem; letter-spacing: -0.5px;">Initialize Secure Mode</h2>
+
+        <p style="color: #64748b; font-size: 1.1rem; line-height: 1.6; margin-bottom: 2.5rem;">To ensure examination integrity, this assessment must be taken in <strong>Full Screen Mode</strong>. You cannot exit this mode or switch tabs until submission.</p>
+        <button id="enterFullScreenBtn" style="width: 100%; background: #2563eb; color: white; border: none; padding: 1.3rem; border-radius: 20px; font-size: 1.2rem; font-weight: 800; cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);">Enter Full Screen & Start</button>
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 1000; justify-content: center; align-items: center; padding: 2rem;">
+    <div style="background: white; border-radius: 35px; width: 100%; max-width: 450px; padding: 3rem; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div style="width: 80px; height: 80px; background: #dcfce7; color: #166534; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin: 0 auto 2rem;">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <h2 style="font-size: 1.5rem; font-weight: 850; color: #1e293b; margin-bottom: 0.8rem;">Assessment Submitted!</h2>
+
+        <p style="color: #64748b; font-size: 1rem; line-height: 1.5; margin-bottom: 2.5rem;">Congratulations! You have completed the examination. Your responses have been securely recorded in our academic database.</p>
+        <button onclick="confirmSubmission()" style="width: 100%; background: #4f46e5; color: white; border: none; padding: 1.2rem; border-radius: 20px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);">OK, Return Home</button>
+    </div>
+</div>
+
+<!-- SECURITY WARNING MODAL -->
+<div id="securityModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); z-index: 2000; justify-content: center; align-items: center; padding: 2rem;">
+    <div style="background: white; border-radius: 35px; width: 100%; max-width: 450px; padding: 3rem; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 2px solid #ef4444;">
+        <div style="width: 70px; height: 70px; background: #fee2e2; color: #dc2626; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 2rem; margin: 0 auto 1.5rem;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 id="securityTitle" style="font-size: 1.8rem; font-weight: 900; color: #1e293b; margin-bottom: 0.8rem;">Security Warning</h2>
+        <p id="securityMsg" style="color: #64748b; font-size: 1rem; line-height: 1.5; margin-bottom: 2rem;"></p>
+        <div id="strikeIndicator" style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2.5rem;">
+            <div class="strike-dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0;"></div>
+            <div class="strike-dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0;"></div>
+            <div class="strike-dot" style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0;"></div>
+        </div>
+        <button id="securityOkBtn" style="width: 100%; background: #1e293b; color: white; border: none; padding: 1.2rem; border-radius: 18px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.3s;">I Understand, Resume Exam</button>
+    </div>
+</div>
+
+<style>
+    .no-select {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.9) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .instr-card {
+        background: white;
+        border: 1.5px solid #f1f5f9;
+        border-radius: 18px;
+        transition: all 0.3s;
+    }
+    .instr-card:hover { transform: translateY(-3px); border-color: #a855f7; box-shadow: 0 8px 20px rgba(168, 85, 247, 0.08); }
+    .instr-num { display: block; font-size: 0.75rem; font-weight: 900; color: #6366f1; margin-bottom: 0.5rem; letter-spacing: 0.5px; }
+    .instr-card p { margin: 0; color: #64748b; font-weight: 600; }
+
+    .btn-enter {
+        background: #6366f1;
+        color: white;
+        border: none;
+        border-radius: 18px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    .btn-enter:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; opacity: 0.6; }
+    .btn-enter:not(:disabled):hover { background: #4f46e5; transform: translateY(-2px); }
+
+    .question-card {
+        background: white;
+        border-radius: 25px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        border: 1.5px solid #f8fafc;
+    }
+    .choice-container {
+        display: flex;
+        align-items: center;
+        background: #fcfcfc;
+        border: 1.5px solid #f1f5f9;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .choice-container:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .choice-container input { display: none; }
+    .choice-container input:checked + .choice-checkmark { background: #6366f1; border-color: #6366f1; }
+    .choice-container input:checked + .choice-checkmark::after { display: block; }
+    .choice-container.active { border-color: #6366f1; background: #f5f3ff; }
+    
+    .choice-checkmark {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #cbd5e1;
+        border-radius: 50%;
+        margin-right: 0.8rem;
+        position: relative;
+        flex-shrink: 0;
+    }
+    .choice-checkmark::after {
+        content: "";
+        position: absolute;
+        display: none;
+        top: 5px;
+        left: 5px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: white;
+    }
+    .choice-text { font-weight: 700; color: #475569; }
+
+    .btn-submit-exam {
+        background: #1e1b4b;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 15px 35px rgba(30, 27, 75, 0.3);
+    }
+    .btn-submit-exam:hover { background: #312e81; transform: translateY(-3px); box-shadow: 0 20px 45px rgba(30, 27, 75, 0.4); }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.getElementById('understandCheckbox');
+        const startBtn = document.getElementById('startExamBtn');
+        const entrance = document.getElementById('entranceSection');
+        const exam = document.getElementById('examSection');
+        const timerDisplay = document.getElementById('timer');
+        const violationInput = document.getElementById('violationCount');
+        
+        const fsPromptModal = document.getElementById('fullscreenPromptModal');
+        const enterFSBtn = document.getElementById('enterFullScreenBtn');
+        const secModal = document.getElementById('securityModal');
+        const secTitle = document.getElementById('securityTitle');
+        const secMsg = document.getElementById('securityMsg');
+        const secOkBtn = document.getElementById('securityOkBtn');
+        const strikeDots = document.querySelectorAll('.strike-dot');
+        
+        let violationCount = 0;
+        let isModalOpen = false;
+        let duration = {{ exam.duration_minutes }} * 60;
+
+        checkbox.addEventListener('change', function() {
+            startBtn.disabled = !this.checked;
+        });
+
+        startBtn.addEventListener('click', function() {
+            // Show the Full Screen Prompt Modal instead of starting immediately
+            fsPromptModal.style.display = 'flex';
+        });
+
+        enterFSBtn.addEventListener('click', function() {
+            fsPromptModal.style.display = 'none';
+            entrance.style.display = 'none';
+            exam.style.display = 'block';
+            exam.classList.add('no-select'); // Prevent text selection
+            
+            startTimer();
+            requestFullScreen();
+            enableAntiCheat();
+        });
+
+        function enableAntiCheat() {
+            // Prevent Right Click
+            document.addEventListener('contextmenu', (e) => {
+                if (exam.style.display === 'block') {
+                    e.preventDefault();
+                    handleViolation('Right-click is disabled during the assessment.');
+                }
+            });
+
+            // Prevent Copy, Cut, Paste
+            ['copy', 'cut', 'paste'].forEach(evt => {
+                document.addEventListener(evt, (e) => {
+                    if (exam.style.display === 'block') {
+                        e.preventDefault();
+                        handleViolation(`Action '${evt}' is prohibited for security reasons.`);
+                    }
+                });
+            });
+
+            // Prevent Selection
+            document.addEventListener('selectstart', (e) => {
+                if (exam.style.display === 'block') {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // Refined Proctoring Logic (3-Strike Rule with Modal)
+        function handleViolation(reason) {
+            if (exam.style.display === 'block' && !isModalOpen) {
+                violationCount++;
+                violationInput.value = violationCount;
+                isModalOpen = true;
+
+                // Update UI based on violation
+                secMsg.textContent = `${reason} This assessment requires constant full-screen focus and window containment. Attempt ${violationCount} of 3 recorded.`;
+                
+                // Update strike dots
+                for (let i = 0; i < violationCount; i++) {
+                    if (strikeDots[i]) strikeDots[i].style.background = '#ef4444';
+                }
+
+                if (violationCount >= 3) {
+                    secTitle.textContent = "TERMINAL VIOLATION";
+                    secTitle.style.color = "#dc2626";
+                    secMsg.textContent = "Critical security protocol breach detected. Maximum warnings exceeded. Your assessment is being submitted automatically for institutional review.";
+                    secOkBtn.textContent = "Finalizing Submission...";
+                    secOkBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        document.getElementById('examForm').submit();
+                    }, 2000);
+                }
+                
+                secModal.style.display = 'flex';
+            }
+        }
+
+        secOkBtn.addEventListener('click', () => {
+            secModal.style.display = 'none';
+            isModalOpen = false;
+            requestFullScreen(); // Re-enforce security
+        });
+
+        window.addEventListener('blur', () => {
+            if (exam.style.display === 'block') {
+                handleViolation('Window focus lost or tab switch attempted.');
+            }
+        });
+        
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && exam.style.display === 'block') {
+                handleViolation('Unauthorized full-screen exit detected.');
+            }
+        });
+
+        // Block specific keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (exam.style.display === 'block') {
+                // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                    (e.ctrlKey && e.key === 'u')) {
+                    e.preventDefault();
+                    handleViolation('Developer tools access attempt.');
+                }
+                // Ctrl+C, Ctrl+V, Ctrl+X
+                if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
+                    e.preventDefault();
+                    handleViolation('Clipboard shortcuts are disabled.');
+                }
+                // Escape key
+                if (e.key === 'Escape') {
+                    // Though fullscreen exit is handled by fullscreenchange, we can warn here too
+                    // if it's pressed while not in fullscreen or to prevent accidental exit
+                    if (document.fullscreenElement) {
+                        // Browser might exit anyway, but we log it
+                    }
+                }
+            }
+        });
+
+        function startTimer() {
+            const timerInterval = setInterval(function() {
+                let minutes = Math.floor(duration / 60);
+                let seconds = duration % 60;
+                timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                if (duration <= 300) timerDisplay.style.color = '#ef4444';
+                if (duration <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('examForm').submit();
+                }
+                duration--;
+            }, 1000);
+        }
+
+        function requestFullScreen() {
+            const el = document.documentElement;
+            try {
+                if (el.requestFullscreen) el.requestFullscreen();
+                else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                else if (el.msRequestFullscreen) el.msRequestFullscreen();
+            } catch (e) {
+                console.log("Security Layer: Fullscreen request bypassed or failed.");
+            }
+        }
+
+
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const name = this.name;
+                document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                    r.closest('.choice-container').classList.remove('active');
+                });
+                this.closest('.choice-container').classList.add('active');
+            });
+        });
+    });
+
+    function showSubmissionModal() {
+        document.getElementById('successModal').style.display = 'flex';
+    }
+
+    function confirmSubmission() {
+        document.getElementById('examForm').submit();
+    }
+</script>
+{% endblock %}

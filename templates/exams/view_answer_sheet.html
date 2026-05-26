@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 2rem auto; padding: 0 1rem;">
+    <!-- Top Navigation -->
+    <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <a href="{% url 'home' %}" style="text-decoration: none; color: #64748b; font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;" onmouseover="this.style.color='#4f46e5'" onmouseout="this.style.color='#64748b'">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{% url 'download_result_pdf' result.pk %}" style="text-decoration: none; background: #10b981; color: white; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </a>
+            <a href="{% url 'student_analytics' %}" style="text-decoration: none; background: white; color: #4f46e5; border: 1.5px solid #eef2ff; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <i class="fa-solid fa-chart-line"></i> View All Analytics
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Result Header -->
+    <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 24px; border-bottom: 4px solid {% if result.is_pass %}#10b981{% else %}#ef4444{% endif %}; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px;">Official Transcript</span>
+                <h1 style="font-size: 1.6rem; font-weight: 850; color: #1e293b; margin: 0.4rem 0 0.2rem 0; letter-spacing: -0.5px;">{{ result.exam.title }}</h1>
+
+                <p style="color: #64748b; font-weight: 600; font-size: 0.95rem;"><i class="fa-solid fa-clock-rotate-left"></i> Submitted on {{ result.completed_at|date:"F d, Y \a\t H:i" }}</p>
+            </div>
+            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+                <div style="font-size: 2.2rem; font-weight: 900; color: #1e293b; line-height: 1;">{{ result.score|floatformat:2 }}<span style="font-size: 1rem; color: #94a3b8;">/{{ result.attempt_total_marks }}</span></div>
+
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    {% if result.is_pass %}
+                        <span style="background: #f0fdf4; color: #15803d; padding: 0 1.8rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; border: 1.5px solid #bbf7d0; display: inline-flex; align-items: center; height: 44px; white-space: nowrap;">PASSED</span>
+                    {% else %}
+                        <span style="background: #fef2f2; color: #b91c1c; padding: 0 1.8rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; border: 1.5px solid #fecaca; display: inline-flex; align-items: center; height: 44px; white-space: nowrap;">FAILED</span>
+                        {% if result.attempt_number < 2 and result.exam.allow_reattempt %}
+                                <a href="{% url 'take_exam' result.exam.pk %}" style="text-decoration: none; background: #4f46e5; color: white; padding: 0 1.8rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; height: 44px; transition: all 0.3s; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2); white-space: nowrap;" onmouseover="this.style.transform='translateY(-2px)'; this.style.background='#4338ca'" onmouseout="this.style.transform='none'; this.style.background='#4f46e5'">
+                                    RE-ATTEMPT
+                                </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics Row -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 2.5rem;">
+        <div class="metric-mini-card">
+            <i class="fa-solid fa-list-ol" style="color: #6366f1;"></i>
+            <span class="m-label">Total Questions</span>
+            <strong class="m-val">{{ kpi_total }}</strong>
+        </div>
+        <div class="metric-mini-card">
+            <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
+            <span class="m-label">Correct</span>
+            <strong class="m-val">{{ result.correct_answers_count }}</strong>
+        </div>
+        <div class="metric-mini-card">
+            <i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i>
+            <span class="m-label">Wrong</span>
+            <strong class="m-val">{{ result.wrong_answers_count }}</strong>
+        </div>
+        <div class="metric-mini-card">
+            <i class="fa-solid fa-hourglass-start" style="color: #f59e0b;"></i>
+            <span class="m-label">Not Attempted</span>
+            <strong class="m-val">{{ kpi_unattempted }}</strong>
+        </div>
+    </div>
+
+    <style>
+        .metric-mini-card {
+            background: white; border-radius: 20px; padding: 1.2rem; border: 1.5px solid #f1f5f9; text-align: center;
+            transition: all 0.3s;
+        }
+        .metric-mini-card:hover { transform: translateY(-3px); border-color: #e2e8f0; }
+        .metric-mini-card i { font-size: 1.2rem; margin-bottom: 0.4rem; display: block; }
+        .m-label { display: block; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 0.2rem; }
+        .m-val { font-size: 1.1rem; color: #1e293b; font-weight: 850; }
+
+    </style>
+
+    <!-- Performance Analysis -->
+    <h3 style="font-weight: 800; font-size: 1.3rem; color: #1e293b; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem;">
+        <i class="fa-solid fa-list-check" style="color: #6366f1;"></i> Question Analysis
+    </h3>
+    
+    {% for ans in enriched_answers %}
+    <div style="background: white; border-radius: 20px; border: 1.5px solid #f1f5f9; padding: 1.5rem; margin-bottom: 1rem; transition: all 0.3s;">
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem;">
+            <div style="display: flex; gap: 0.8rem; align-items: center;">
+                <span style="background: #f8fafc; color: #64748b; width: 32px; height: 32px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 0.8rem;">{{ forloop.counter }}</span>
+                {% if ans.is_correct %}
+                    <span style="background: #f0fdf4; color: #15803d; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.7rem; font-weight: 800;">CORRECT</span>
+                {% elif ans.selected_choice %}
+                    <span style="background: #fef2f2; color: #b91c1c; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.7rem; font-weight: 800;">INCORRECT</span>
+                {% else %}
+                    <span style="background: #fff7ed; color: #9a3412; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.7rem; font-weight: 800;">NOT ANSWERED</span>
+                {% endif %}
+            </div>
+            <div style="font-weight: 800; font-size: 0.8rem; color: #94a3b8;">
+                Marks: {% if ans.is_correct %}+{{ ans.question.marks }}{% elif ans.selected_choice %}-{{ result.exam.negative_marks }}{% else %}0.0{% endif %}
+            </div>
+        </div>
+
+        <p style="font-size: 1rem; font-weight: 700; color: #1e293b; line-height: 1.5; margin-bottom: 1.5rem;">{{ ans.question.text }}</p>
+
+
+        <!-- Options Display -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; margin-bottom: 1.5rem;">
+            {% for choice in ans.question.choices.all %}
+                <div style="padding: 1rem; border-radius: 15px; border: 1.5px solid 
+                    {% if choice == ans.correct_choice %}#bbf7d0
+                    {% elif choice == ans.selected_choice %}#fecaca
+                    {% else %}#f1f5f9{% endif %};
+                    background: 
+                    {% if choice == ans.correct_choice %}#f0fdf4
+                    {% elif choice == ans.selected_choice %}#fef2f2
+                    {% else %}#fafafa{% endif %};
+                    position: relative; display: flex; align-items: center; gap: 0.8rem;">
+                    
+                    <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid 
+                        {% if choice == ans.correct_choice %}#10b981{% elif choice == ans.selected_choice %}#ef4444{% else %}#cbd5e1{% endif %};
+                        background: {% if choice == ans.correct_choice %}#10b981{% elif choice == ans.selected_choice %}#ef4444{% else %}white{% endif %};
+                        display: flex; justify-content: center; align-items: center; color: white; font-size: 0.7rem;">
+                        {% if choice == ans.correct_choice %}<i class="fa-solid fa-check"></i>{% elif choice == ans.selected_choice %}<i class="fa-solid fa-xmark"></i>{% endif %}
+                    </div>
+                    
+                    <span style="font-weight: 700; color: #334155; font-size: 0.85rem;">{{ choice.text }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div style="background: #f8fafc; border-radius: 18px; padding: 1.2rem; border: 1.5px solid #e2e8f0; display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="background: white; padding: 0.5rem; border-radius: 10px; border: 1.5px solid #f1f5f9; color: #6366f1;">
+                <i class="fa-solid fa-lightbulb"></i>
+            </div>
+            <div>
+                <strong style="display: block; font-size: 0.7rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.5px;">{% if ans.question.explanation %}Explanation{% else %}Feedback{% endif %}</strong>
+                <p style="margin: 0; color: #475569; font-size: 0.85rem; line-height: 1.4; font-weight: 600;">
+                    {% if ans.question.explanation %}
+                        {{ ans.question.explanation }}
+                    {% else %}
+                        {% if ans.is_correct %}
+                            Great job! You understood this concept well.
+                        {% elif ans.selected_choice %}
+                            You missed this one. Please check the correct answer and review this topic.
+                        {% else %}
+                            You skipped this. Try to attempt similar questions in the future to improve your score.
+                        {% endif %}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div style="text-align: center; margin: 3rem 0;">
+        <a href="{% url 'home' %}" class="btn btn-primary" style="padding: 1rem 3rem; border-radius: 50px; font-weight: 800; font-size: 1rem; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);">Return to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

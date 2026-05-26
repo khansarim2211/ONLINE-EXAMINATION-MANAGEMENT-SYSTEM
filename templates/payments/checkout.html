@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 4rem auto; padding: 0 1rem;">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 2.5rem; font-weight: 900; color: #1e293b; letter-spacing: -1px; margin-bottom: 0.5rem;">Secure Checkout</h1>
+        <p style="color: #64748b; font-size: 1.1rem; font-weight: 500;">Complete your payment to unlock your re-attempt for <strong style="color: #4f46e5;">{{ exam.title }}</strong></p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2.5rem; align-items: start;">
+        <!-- Left Column: Payment Details -->
+        <div class="glass-panel" style="padding: 2.5rem; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+            <h3 style="font-weight: 800; font-size: 1.3rem; margin-bottom: 2rem; color: #1e293b; display: flex; align-items: center; gap: 0.8rem;">
+                <i class="fa-solid fa-credit-card" style="color: #4f46e5;"></i> Payment Method
+            </h3>
+
+            <!-- Simulated Credit Card -->
+            <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 1.5rem; border-radius: 18px; color: white; margin-bottom: 2.5rem; position: relative; overflow: hidden; box-shadow: 0 15px 30px rgba(30, 27, 75, 0.2);">
+                <div style="position: absolute; right: -20px; top: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
+                    <div style="width: 50px; height: 35px; background: #fbbf24; border-radius: 6px; position: relative;">
+                        <div style="position: absolute; top: 15px; left: 0; width: 100%; height: 5px; background: rgba(0,0,0,0.1);"></div>
+                    </div>
+                    <i class="fa-brands fa-cc-visa" style="font-size: 2.5rem; opacity: 0.8;"></i>
+                </div>
+                
+                <div style="font-family: 'Courier New', Courier, monospace; font-size: 1.4rem; letter-spacing: 4px; margin-bottom: 1.5rem;">
+                    **** **** **** 4242
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <div style="font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; margin-bottom: 2px;">Card Holder</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">{{ request.user.get_full_name|default:request.user.username }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; margin-bottom: 2px;">Expires</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">12 / 28</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mock Form Fields -->
+            <div style="display: grid; gap: 1.2rem;">
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 0.5rem;">Cardholder Name</label>
+                    <input type="text" value="{{ request.user.get_full_name|default:request.user.username }}" disabled style="width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1.5px solid #e2e8f0; background: #f8fafc; color: #94a3b8;">
+                </div>
+                
+                <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; margin-top: 1rem;">
+                    <i class="fa-brands fa-cc-mastercard" style="font-size: 2rem; color: #cbd5e1;"></i>
+                    <i class="fa-brands fa-cc-apple-pay" style="font-size: 2rem; color: #cbd5e1;"></i>
+                    <i class="fa-brands fa-cc-paypal" style="font-size: 2rem; color: #cbd5e1;"></i>
+                    <i class="fa-brands fa-google-pay" style="font-size: 2rem; color: #cbd5e1;"></i>
+                </div>
+            </div>
+
+            <form action="{% url 'process_payment' exam.id %}" method="post" style="margin-top: 2.5rem;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.2rem; border-radius: 15px; font-weight: 800; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; gap: 0.8rem; background: #4f46e5; border: none; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 15px 30px rgba(79, 70, 229, 0.35)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 10px 25px rgba(79, 70, 229, 0.25)'">
+                    Complete Payment • ₹{{ amount }}
+                </button>
+                <p style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">
+                    <i class="fa-solid fa-lock"></i> 256-bit SSL Encrypted Transaction
+                </p>
+            </form>
+        </div>
+
+        <!-- Right Column: Summary -->
+        <div>
+            <div class="glass-panel" style="padding: 2rem; border-radius: 24px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                <h4 style="font-weight: 800; font-size: 1.1rem; margin-bottom: 1.5rem; color: #1e293b;">Order Summary</h4>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1.5px solid #e2e8f0;">
+                    <div style="color: #64748b; font-weight: 600;">Re-attempt Fee</div>
+                    <div style="color: #1e293b; font-weight: 700;">₹{{ amount }}</div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div style="color: #64748b; font-weight: 600;">Processing Fee</div>
+                    <div style="color: #10b981; font-weight: 700;">FREE</div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+                    <div style="font-weight: 900; font-size: 1.3rem; color: #1e293b;">Total Amount</div>
+                    <div style="font-weight: 900; font-size: 1.5rem; color: #4f46e5;">₹{{ amount }}</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1.5rem; border-radius: 20px; background: #f0fdf4; border: 1px solid #bbf7d0;">
+                <h5 style="color: #166534; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-shield-halved"></i> Refund Policy
+                </h5>
+                <p style="color: #15803d; font-size: 0.8rem; line-height: 1.5; margin: 0;">
+                    Payments for re-attempts are final and non-refundable. Please ensure you are ready before proceeding.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+/* Jazzmin Admin Customizations */
+
+/* Hide Recent Actions from Dashboard */
+.dashboard .col-lg-3 {
+    display: none !important;
+}
+
+/* Make main content full width on dashboard */
+.dashboard .col-lg-9 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+}
+
+/* History Page (LogEntry) Customizations */
+#changelist-filter {
+    background: #f8fafc !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+#changelist-filter h3 {
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    color: #4f46e5 !important;
+}
+
+/* Bold timestamps and user names in history */
+.field-action_time {
+    font-weight: 700 !important;
+    color: #4f46e5 !important;
+}
+
+.field-user {
+    font-weight: 600 !important;
+}
+
+/* Professional Audit Log Colors */
+.field-action_flag .badge-success { background: #ecfdf5 !important; color: #059669 !important; }
+.field-action_flag .badge-danger { background: #fef2f2 !important; color: #dc2626 !important; }
+.field-action_flag .badge-info { background: #f0f9ff !important; color: #0ea5e9 !important; }

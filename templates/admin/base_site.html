@@ -1,0 +1,179 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* GLOBAL OVERRIDES */
+    body {
+        font-family: 'Inter', sans-serif !important;
+        background: #f8fafc !important;
+        color: #1e293b !important;
+    }
+
+    /* HEADER STYLING */
+    #header {
+        background: #0f172a !important; /* Slate 900 */
+        color: white !important;
+        padding: 1.5rem 2rem !important;
+        border-bottom: none !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+
+    #branding h1 {
+        font-weight: 850 !important;
+        letter-spacing: -1px !important;
+        font-size: 1.4rem !important;
+        color: #818cf8 !important; /* Indigo 400 */
+    }
+
+    #branding h1 a {
+        color: #818cf8 !important;
+    }
+
+    /* BREADCRUMBS */
+    .breadcrumbs {
+        background: white !important;
+        padding: 0.8rem 2rem !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
+    }
+
+    .breadcrumbs a {
+        color: #4f46e5 !important;
+    }
+
+    /* MODULES & CARDS */
+    .module {
+        background: white !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .module h2, .module caption {
+        background: #f8fafc !important;
+        color: #1e293b !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        font-size: 0.75rem !important;
+        padding: 1rem 1.5rem !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    /* TABLES */
+    #changelist table thead th {
+        background: #f8fafc !important;
+        padding: 1rem !important;
+        font-weight: 800 !important;
+        color: #64748b !important;
+        text-transform: uppercase !important;
+        font-size: 0.7rem !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+    }
+
+    #changelist table tbody tr {
+        transition: background 0.2s !important;
+    }
+
+    #changelist table tbody tr:hover {
+        background: #f1f5f9 !important;
+    }
+
+    /* BUTTONS */
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: #4f46e5 !important; /* Indigo 600 */
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 700 !important;
+        text-transform: none !important;
+        transition: all 0.2s !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2) !important;
+    }
+
+    .button:hover, input[type=submit]:hover {
+        background: #4338ca !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3) !important;
+    }
+
+    .button.default, input[type=submit].default {
+        background: #4f46e5 !important;
+    }
+
+    /* HIDE RECENT ACTIONS SIDEBAR ON DASHBOARD */
+    .dashboard #content-related {
+        display: none !important;
+    }
+    .dashboard #content {
+        width: 100% !important;
+    }
+
+    /* USER LINKS / HEADER BUTTONS */
+    #user-tools {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    #user-tools a {
+        background: rgba(255, 255, 255, 0.1) !important;
+        padding: 0.4rem 1rem !important;
+        border-radius: 8px !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        transition: all 0.2s !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+    }
+
+    #user-tools a:hover {
+        background: #4f46e5 !important;
+        border-color: #818cf8 !important;
+    }
+
+    /* SCROLLBAR */
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Examify <span>Management</span></a></h1>
+{% endblock %}
+
+{% block userlinks %}
+    <a href="{% url 'admin:admin_logentry_changelist' %}" class="history-link">
+        <i class="fa-solid fa-clock-rotate-left"></i> System History
+    </a>
+    {% if site_url %}
+        <a href="{{ site_url }}">{% translate 'View site' %}</a> /
+    {% endif %}
+    {% if user.is_active and user.is_staff %}
+        {% url 'django-admindocs-docroot' as docsroot %}
+        {% if docsroot %}
+            <a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
+        {% endif %}
+    {% endif %}
+    {% if user.has_usable_password %}
+    <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+    {% endif %}
+    <a href="{% url 'admin:logout' %}">{% translate 'Log out' %}</a>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examify - Professional Examination Management</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* HIGH-END COLOR PALETTE (Vibrant Stripe-like UI) */
+        :root {
+            --primary-color: #4f46e5;
+            /* Indigo 600 */
+            --primary-hover: #4338ca;
+            /* Indigo 700 */
+            --secondary-color: #ec4899;
+            /* Pink 500 */
+            --accent-color: #06b6d4;
+            /* Cyan 500 */
+
+            --bg-nav: rgba(255, 255, 255, 0.85);
+            --bg-card: rgba(255, 255, 255, 0.95);
+
+            --text-main: #0f172a;
+            /* Slate 900 */
+            --text-muted: #475569;
+            /* Slate 600 */
+
+            --border-color: #e2e8f0;
+            /* Slate 200 */
+            --radius-md: 12px;
+            --radius-lg: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            height: 100%;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+
+            /* Custom Sleek Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Stunning Modern Mesh Gradient Background */
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0.2) 0, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(188, 71%, 38%, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(253, 88%, 57%, 0.15) 0, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.75rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .nav-brand {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #4338ca;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: #1e293b;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-link:hover {
+            color: #4338ca;
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.23);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-main);
+            transform: translateY(-2px);
+        }
+
+        /* LAYOUT & CARDS */
+        .main-container {
+            flex: 1 0 auto; /* Allow to grow, don't shrink, auto basis */
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 5%;
+        }
+
+        .glass-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+        }
+
+        /* UNIVERSAL FORM STYLING FOR PERFECT ALIGNMENT */
+        .form-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        /* Style all django form inputs perfectly */
+        .form-group input,
+        .form-group select,
+        .form-group textarea,
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            color: var(--text-main);
+            background-color: #f8fafc;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus,
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .help-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: -0.2rem;
+        }
+
+        /* ALERTS / MESSAGES */
+        .alert-messages {
+            margin-bottom: 2rem;
+            list-style: none;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-warning {
+            background-color: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fef08a;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* FOOTER */
+        footer {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 2rem 5%;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: auto;
+            flex-shrink: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    {% if not hide_nav %}
+    <nav class="navbar" style="padding: 1rem 5%;">
+        <a href="/" class="nav-brand">
+            <i class="fa-solid fa-graduation-cap"></i>
+            Examify
+        </a>
+
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+            <!-- User Profile Link (Alan Style) -->
+            <a href="{% url 'profile_update' %}" class="nav-link" style="background: #eef2ff; padding: 0.4rem 1.2rem; border-radius: 50px; color: #4338ca; display: flex; align-items: center; gap: 0.6rem; border: 1.5px solid #e2e8f0;">
+
+
+                {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #4f46e5; display: flex; justify-content: center; align-items: center; color: white; font-size: 0.7rem;">{{ user.first_name|first|upper }}</div>
+
+
+                {% endif %}
+                <span style="font-weight: 800;">{{ user.first_name|default:user.username }}</span>
+            </a>
+            
+            {% if user.is_teacher %}
+                <a href="{% url 'teacher_analytics_overview' %}" class="nav-link" style="font-weight: 800; font-size: 0.9rem;"><i class="fa-solid fa-chart-column"></i> Analytics</a>
+            {% elif user.is_student %}
+                <a href="{% url 'student_analytics' %}" class="nav-link" style="font-weight: 800; font-size: 0.9rem;"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+            {% endif %}
+
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1.5rem; border-radius: 12px; font-size: 0.85rem; background: white; font-weight: 800; border: 1.5px solid #e2e8f0;">Logout</button>
+            </form>
+            {% else %}
+            <a href="{% url 'login' %}" class="nav-link">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-primary" style="padding: 0.6rem 1.5rem; border-radius: 12px;">Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- CONTENT -->
+    <main class="main-container" {% if hide_nav %}style="padding: 0; max-width: 100%;"{% endif %}>
+        {% if messages %}
+        <ul class="alert-messages">
+            {% for message in messages %}
+            <li class="alert alert-{{ message.tags|default:'info' }}">
+                {% if message.tags == 'success' %}<i class="fa-solid fa-circle-check"></i>{% endif %}
+                {% if message.tags == 'error' %}<i class="fa-solid fa-triangle-exclamation"></i>{% endif %}
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    {% if not hide_nav %}
+    <footer style="background: white; border-top: 1px solid #e2e8f0; padding: 1.2rem 5%; color: var(--text-muted); margin-top: auto; font-size: 0.9rem; width: 100%; flex-shrink: 0;">
+        <div style="width: 100%; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <span><i class="fa-solid fa-graduation-cap" style="color: var(--primary-color);"></i> <strong style="color: var(--text-main);">Examify</strong> © 2026. All rights reserved.</span>
+            <span>Developed by <strong style="color: var(--text-main);">Mohd Sarim Khan</strong> | Built securely with <i class="fa-brands fa-python" style="color: #3776ab;"></i> Django</span>
+        </div>
+    </footer>
+    {% endif %}
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTopBtn" title="Go to top" style="display: none; position: fixed; bottom: 32px; right: 32px; z-index: 9999; border: none; outline: none; background: linear-gradient(135deg, #4f46e5, #ec4899); color: white; cursor: pointer; padding: 15px; border-radius: 50%; width: 50px; height: 50px; font-size: 18px; box-shadow: 0 8px 32px rgba(79, 70, 229, 0.3); transition: all 0.3s ease; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Auto-dismiss alert messages
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    alert.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+                    alert.style.opacity = "0";
+                    alert.style.transform = "translateY(-10px)";
+                    setTimeout(function() {
+                        alert.style.display = "none";
+                    }, 500); // Wait for fade out to complete
+                });
+            }, 4000); // Start disappearing after 4 seconds
+        });
+
+        let mybutton = document.getElementById("scrollToTopBtn");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        };
+        mybutton.onclick = function() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+    </script>
+</body>
+
+</html>

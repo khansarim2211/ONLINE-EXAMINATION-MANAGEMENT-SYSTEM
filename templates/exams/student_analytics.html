@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Include SweetAlert2 for professional popups -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div style="max-width: 1200px; margin: 3rem auto; padding: 0 1rem;">
+    <!-- Top Navigation -->
+    <div style="margin-bottom: 2.5rem;">
+        <a href="{% url 'home' %}" style="text-decoration: none; color: #64748b; font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; transition: all 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color='#64748b'">
+            <i class="fa-solid fa-arrow-left"></i> Back to Academic Dashboard
+        </a>
+    </div>
+
+    <!-- Premium Header: Matched with Home Dashboard Colors -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3.5rem; background: linear-gradient(135deg, #0f172a, #1e293b); padding: 3rem; border-radius: 35px; color: white; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.3); position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="z-index: 1;">
+            <h1 style="font-size: 2.8rem; font-weight: 900; margin-bottom: 0.5rem; letter-spacing: -1.5px; line-height: 1.1;">Examination Portfolio</h1>
+            <p style="color: #94a3b8; font-size: 1.1rem; font-weight: 500; max-width: 600px;">A comprehensive record of your academic assessments, validated certifications, and performance trajectory.</p>
+        </div>
+        
+        <div style="display: flex; gap: 1.5rem; z-index: 1;">
+            <div style="background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border-radius: 25px; padding: 1.5rem 2.5rem; border: 1px solid rgba(255,255,255,0.05); text-align: center; min-width: 160px;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 800; color: #6366f1; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Assessments</span>
+                <span style="font-size: 2rem; font-weight: 900;">{{ past_results|length }}</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border-radius: 25px; padding: 1.5rem 2.5rem; border: 1px solid rgba(255,255,255,0.05); text-align: center; min-width: 160px;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 800; color: #6366f1; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Avg. Accuracy</span>
+                <span style="font-size: 2rem; font-weight: 900; color: #4ade80;">{{ kpi_avg_score|floatformat:0 }}%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Command Center -->
+    <div style="background: white; border-radius: 35px; border: 2px solid #f1f5f9; box-shadow: 0 10px 40px rgba(0,0,0,0.02); overflow: hidden;">
+        <div style="padding: 1.5rem 2.5rem; border-bottom: 1px solid #f1f5f9; background: #fafafa; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-weight: 800; font-size: 1.1rem; color: #1e293b;">Official Academic Transcript</h3>
+            <div style="display: flex; gap: 0.5rem; align-items: center; color: #64748b; font-size: 0.85rem; font-weight: 700;">
+                <i class="fa-solid fa-circle-check" style="color: #6366f1;"></i> Verified Record
+            </div>
+        </div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background: #fcfcfc; border-bottom: 1px solid #f1f5f9; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 800;">
+                        <th style="padding: 1.5rem 2.5rem;">Assessment Title</th>
+                        <th style="padding: 1.5rem 2.5rem;">Subject</th>
+                        <th style="padding: 1.5rem 2.5rem; text-align: center;">Attempt</th>
+                        <th style="padding: 1.5rem 2.5rem;">Score</th>
+                        <th style="padding: 1.5rem 2.5rem;">Status</th>
+                        <th style="padding: 1.5rem 2.5rem;">Date Finalized</th>
+                        <th style="padding: 1.5rem 2.5rem; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in past_results %}
+                    <tr style="border-bottom: 1px solid #f8fafc; transition: all 0.2s;" onmouseover="this.style.background='#f8faff'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 1.8rem 2.5rem;">
+                            <strong style="display: block; font-size: 1rem; color: #1e293b; margin-bottom: 0.2rem;">{{ res.exam.title }}</strong>
+                        </td>
+                        <td style="padding: 1.8rem 2.5rem;">
+                            <span style="color: #6366f1; font-weight: 800; font-size: 0.8rem; background: #eef2ff; padding: 0.4rem 0.8rem; border-radius: 10px; white-space: nowrap;">{{ res.exam.course.name }}</span>
+                        </td>
+                        <td style="padding: 1.8rem 2.5rem; text-align: center;">
+                            <span style="font-weight: 900; color: #64748b; font-size: 0.9rem;">#{{ res.attempt_number }}</span>
+                        </td>
+                        <td style="padding: 1.8rem 2.5rem;">
+                            <div style="display: flex; flex-direction: column;">
+                                <strong style="color: #1e293b; font-size: 1.1rem;">{{ res.score|floatformat:2 }}</strong>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 700;">of {{ res.attempt_total_marks }}</span>
+                            </div>
+                        </td>
+                        <td style="padding: 1.8rem 2.5rem;">
+                            {% if res.is_pass or res.exam_passed_overall %}
+                                <span style="background: #f0fdf4; color: #15803d; padding: 0.5rem 1.2rem; border-radius: 12px; font-size: 0.75rem; font-weight: 800; border: 1.5px solid #bbf7d0;">PASSED</span>
+                            {% else %}
+                                <span style="background: #fef2f2; color: #b91c1c; padding: 0.5rem 1.2rem; border-radius: 12px; font-size: 0.75rem; font-weight: 800; border: 1.5px solid #fecaca;">FAILED</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1.8rem 2.5rem; color: #64748b; font-weight: 700; font-size: 0.85rem;">
+                            {{ res.completed_at|date:"d M, Y" }}
+                        </td>
+                        <td style="padding: 1.8rem 2.5rem;">
+                            <div style="display: flex; gap: 1rem; justify-content: center; align-items: center;">
+                                <a href="{% url 'view_answer_sheet' res.pk %}" title="View Analysis" style="width: 40px; height: 40px; border-radius: 12px; background: white; color: #4f46e5; border: 1.5px solid #eef2ff; display: flex; justify-content: center; align-items: center; transition: all 0.2s;" onmouseover="this.style.background='#4f46e5'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='#4f46e5'">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                </a>
+                                
+                                <a href="{% url 'download_result_pdf' res.pk %}" title="Download Transcript" style="width: 40px; height: 40px; border-radius: 12px; background: white; color: #10b981; border: 1.5px solid #ecfdf5; display: flex; justify-content: center; align-items: center; transition: all 0.2s;" onmouseover="this.style.background='#10b981'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='#10b981'">
+                                    <i class="fa-solid fa-download"></i>
+                                </a>
+                                
+                                <!-- Integrated Feedback Controls -->
+                                {% if not res.exam_passed_overall and res.attempt_number < 2 and res.exam.allow_reattempt %}
+                                <button onclick="handleReattempt('True', '{% url 'take_exam' res.exam.pk %}')" 
+                                        style="width: 40px; height: 40px; border-radius: 12px; background: #fef2f2; color: #dc2626; border: 1.5px solid #fecaca; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s;"
+                                        onmouseover="this.style.background='#dc2626'; this.style.color='white'" onmouseout="this.style.background='#fef2f2'; this.style.color='#dc2626'">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                </button>
+                                {% else %}
+                                <button onclick="handleLocked('True', '{{ res.attempt_number }}')" 
+                                        style="width: 40px; height: 40px; border-radius: 12px; background: #f8fafc; color: #cbd5e1; border: 1.5px solid #f1f5f9; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s;">
+                                    <i class="fa-solid fa-lock"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="padding: 6rem 2rem; text-align: center;">
+                            <div style="font-size: 4rem; color: #e2e8f0; margin-bottom: 2rem;"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <h4 style="color: #1e293b; font-weight: 900; font-size: 1.4rem; margin-bottom: 0.5rem;">No Academic Records Found</h4>
+                            <p style="color: #94a3b8; font-weight: 600;">Complete your first examination to generate your academic scorecard.</p>
+                            <a href="{% url 'home' %}" style="display: inline-block; margin-top: 2rem; background: #6366f1; color: white; padding: 1rem 2.5rem; border-radius: 20px; text-decoration: none; font-weight: 800; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);">Return to Dashboard</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleReattempt(isEligible, url) {
+        Swal.fire({
+            title: 'Final Opportunity',
+            text: 'You are eligible for a second and final attempt. We recommend reviewing your previous performance analysis before beginning. Proceed now?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#6366f1',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Initialize Final Attempt',
+            cancelButtonText: 'Review First'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    function handleLocked(isPass, attemptNumber) {
+        let title = 'Access Restricted';
+        let msg = 'You have already finalized this assessment.';
+        
+        if (isPass === 'True') {
+            title = 'Assessment Cleared';
+            msg = 'Our records show you have successfully passed this examination. No further attempts are required or permitted for this credit.';
+        } else if (parseInt(attemptNumber) >= 2) {
+            title = 'Attempts Exhausted';
+            msg = 'You have completed both allowed attempts for this examination. Your final performance is now officially archived.';
+        } else {
+            msg = 'This assessment does not currently permit re-evaluations based on the instructor settings.';
+        }
+
+        Swal.fire({
+            title: title,
+            text: msg,
+            icon: 'info',
+            confirmButtonColor: '#1e293b',
+            confirmButtonText: 'Acknowledge'
+        });
+    }
+</script>
+{% endblock %}

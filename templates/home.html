@@ -1,0 +1,802 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Home Page Specific High-End Styles */
+    .hero-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4rem;
+        padding: 5rem 0 2rem;
+    }
+
+    .hero-text {
+        flex: 1;
+        max-width: 600px;
+        animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .hero-tag {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        background: rgba(79, 70, 229, 0.1);
+        color: var(--primary-color);
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 900;
+        line-height: 1.05;
+        letter-spacing: -1.5px;
+        color: var(--text-main);
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-title span {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+        font-weight: 400;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    /* The modern UI widget preview floating art */
+    .hero-visual {
+        flex: 1;
+        position: relative;
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: floatImg 6s ease-in-out infinite;
+    }
+
+    .abstract-widget {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        padding: 2rem;
+        width: 100%;
+        max-width: 450px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        position: relative;
+        z-index: 2;
+    }
+
+    .widget-line {
+        height: 12px;
+        border-radius: 6px;
+        background: #f1f5f9;
+        margin-bottom: 1rem;
+    }
+
+    /* Feature Grid Section */
+    .trusted-by {
+        text-align: center;
+        margin-top: 5rem;
+        padding-top: 3rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .trusted-by h4 {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #94a3b8;
+        margin-bottom: 2rem;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .feature-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        padding: 2.5rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e1;
+    }
+
+    .feature-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes floatImg {
+        0% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(1deg);
+        }
+
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+    }
+
+    /* New Attractive Sections */
+    .steps-section {
+        padding: 5rem 0;
+        text-align: center;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        margin-top: 2rem;
+    }
+    
+    .steps-section h4 {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #94a3b8;
+        margin-bottom: 1rem;
+    }
+
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3rem;
+        margin-top: 3rem;
+        position: relative;
+    }
+
+    .step-card {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.8);
+        border-radius: 20px;
+        padding: 2.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .step-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    .step-number {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .stats-section {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.03), rgba(236, 72, 153, 0.03));
+        border-radius: 30px;
+        padding: 4rem 2rem;
+        margin-top: 4rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+        border: 1px solid rgba(255,255,255,0.7);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.02);
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .stat-item h2 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-item p {
+        color: #64748b;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
+    }
+</style>
+
+{% if not user.is_authenticated %}
+<!-- LOGGED OUT VIEW: Breathtaking Landing Page -->
+<div class="hero-section">
+    <div class="hero-text">
+        <h1 class="hero-title">Exams Reimagined.<br><span>Smart & Secure.</span></h1>
+        <p class="hero-subtitle">The ultimate examination management software. Beautiful analytics, instant automated grading, and a seamless testing experience designed for modern educators.</p>
+        <div class="hero-buttons">
+            <a href="{% url 'register' %}" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">Sign Up</a>
+            <a href="{% url 'login' %}" class="btn btn-outline"
+                style="padding: 1rem 2rem; font-size: 1.1rem; background: white;">Member Login</a>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; align-items: center; gap: 1rem;">
+            <!-- Avatar stack -->
+            <div style="display: flex; margin-right: 0.5rem;">
+                <div
+                    style="width: 40px; height: 40px; border-radius: 50%; background: #fbbf24; border: 3px solid white; z-index: 3;">
+                </div>
+                <div
+                    style="width: 40px; height: 40px; border-radius: 50%; background: #34d399; border: 3px solid white; margin-left: -15px; z-index: 2;">
+                </div>
+                <div
+                    style="width: 40px; height: 40px; border-radius: 50%; background: #60a5fa; border: 3px solid white; margin-left: -15px; z-index: 1;">
+                </div>
+            </div>
+            <div style="font-size: 0.9rem; color: #64748b; font-weight: 500;">
+                <strong style="color: var(--text-main);">10,000+</strong> students enrolled
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-visual">
+        <!-- Decorative blur blobs behind widget -->
+        <div
+            style="position: absolute; top: 10%; right: 10%; width: 250px; height: 250px; background: rgba(79, 70, 229, 0.4); filter: blur(60px); border-radius: 50%; z-index: 1;">
+        </div>
+        <div
+            style="position: absolute; bottom: 10%; left: 10%; width: 250px; height: 250px; background: rgba(236, 72, 153, 0.4); filter: blur(60px); border-radius: 50%; z-index: 1;">
+        </div>
+
+        <!-- Sleek Pseudo Dashboard Widget -->
+        <div class="abstract-widget">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem;">
+                <strong style="font-size: 1.2rem;">Live Analytics</strong>
+                <span
+                    style="background: #dcfce7; color: #166534; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: bold;">+24%
+                    passed</span>
+            </div>
+            <div
+                style="display: flex; align-items: flex-end; gap: 1rem; height: 120px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div style="flex: 1; background: #bfdbfe; height: 40%; border-radius: 6px 6px 0 0;"></div>
+                <div style="flex: 1; background: #93c5fd; height: 60%; border-radius: 6px 6px 0 0;"></div>
+                <div style="flex: 1; background: #60a5fa; height: 85%; border-radius: 6px 6px 0 0;"></div>
+                <div
+                    style="flex: 1; background: var(--primary-color); height: 100%; border-radius: 6px 6px 0 0; position: relative;">
+                    <div
+                        style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; font-weight: bold;">
+                        Peak</div>
+                </div>
+            </div>
+            <div class="widget-line" style="width: 80%;"></div>
+            <div class="widget-line" style="width: 60%;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="trusted-by">
+    <h4>Experience Next-Generation Features</h4>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon-wrapper" style="background: #eff6ff; color: #3b82f6;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Secure Environments</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Protect academic integrity with strictly firewalled examinations and bulletproof backend architecture to ensure fair testing.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-wrapper" style="background: #fdf2f8; color: #ec4899;">
+                <i class="fa-solid fa-stopwatch"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Instant Grading</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Save hundreds of hours every semester. Exams are evaluated instantly the moment a student hits submit, delivering real-time scores.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-wrapper" style="background: #f0fdf4; color: #22c55e;">
+                <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Actionable Insights</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Track progress effortlessly. Beautiful, interactive dashboards break down performance metrics so you can focus on student success.</p>
+        </div>
+    </div>
+</div>
+
+<!-- HOW IT WORKS SECTION -->
+<div class="steps-section">
+    <h4>Simple Yet Powerful Workflow</h4>
+    <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">How Examify Works</h2>
+    <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">A seamless experience from exact creation to intelligent reporting.</p>
+    
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">Create Exam instantly</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Educators utilize our AI-powered Fast Paste Mode to upload hundreds of questions in seconds. No more tedious manual entry.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">Secure Examination</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Students log in securely via departmental firewalls to access their specific test. Anti-cheat measures block duplicate attempts.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">Automated Analytics</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">The system grades every test instantly upon completion, factoring in advanced configurations like negative marking automatically.</p>
+        </div>
+    </div>
+</div>
+
+<!-- STATS SECTION -->
+<div class="stats-section">
+    <div class="stat-item">
+        <h2>99%</h2>
+        <p>Time Saved Grading</p>
+    </div>
+    <div class="stat-item">
+        <h2>0</h2>
+        <p>Paper Wasted</p>
+    </div>
+    <div class="stat-item">
+        <h2>10x</h2>
+        <p>Faster Setup</p>
+    </div>
+</div>
+
+{% else %}
+<!-- LOGGED IN VIEW: Dynamic Dashboard Hub -->
+<div id="welcomeHub" style="display: block; max-width: 800px; margin: 4rem auto; padding: 0 1rem;">
+    <div style="background: white; border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.06); padding: 4rem; position: relative; text-align: center; border: 1.5px solid #f8fafc;">
+        <!-- Decorations -->
+        <div style="position: absolute; top: -20px; left: -20px; font-size: 3rem; transform: rotate(-20deg);">🚀</div>
+        <div style="position: absolute; bottom: -10px; right: -20px; font-size: 3rem; transform: rotate(15deg);">☀️</div>
+        
+        <!-- Avatar -->
+        <div style="margin-bottom: 2rem;">
+            {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 6px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            {% else %}
+                <div style="width: 120px; height: 120px; border-radius: 50%; background: #f1f5f9; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 3rem; font-weight: 900; color: #94a3b8; border: 6px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">{{ user.first_name|make_list|first|upper }}</div>
+            {% endif %}
+        </div>
+
+        <h1 style="font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 0.5rem; letter-spacing: -1px;">Welcome, {{ user.first_name }}!</h1>
+
+        <p style="color: #64748b; font-size: 1.2rem; font-weight: 600; margin-bottom: 3rem;">You are securely authenticated via Django infrastructure.</p>
+
+        <!-- Permission Card -->
+        <div style="display: flex; background: #fff; border: 1.5px solid #f1f5f9; border-radius: 25px; margin-bottom: 3rem; overflow: hidden;">
+            <div style="flex: 1; padding: 2rem; border-right: 1.5px solid #f1f5f9; text-align: center;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Portal Permission</span>
+                <div style="color: #6366f1; font-weight: 900; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    {% if user.is_student %}
+                        <i class="fa-solid fa-user-graduate"></i> Scholar
+                    {% else %}
+                        <i class="fa-solid fa-chalkboard-user"></i> Educator
+                    {% endif %}
+                </div>
+            </div>
+            <div style="flex: 1; padding: 2rem; text-align: center;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Zone</span>
+                <div style="color: #1e293b; font-weight: 900; font-size: 1.4rem;">{{ user.department|default:"Main Campus" }}</div>
+            </div>
+        </div>
+
+        <button onclick="launchDashboard()" style="width: 100%; background: #4f46e5; color: white; border: none; padding: 1.5rem; border-radius: 25px; font-size: 1.25rem; font-weight: 800; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 1rem; box-shadow: 0 15px 35px rgba(79, 70, 229, 0.3);">
+            {% if user.is_student %}Launch Academic Dashboard{% else %}Enter Testing Infrastructure{% endif %} <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<div id="mainDashboard" style="display: none; padding: 2rem 0;">
+    <script>
+        function launchDashboard() {
+            document.getElementById('welcomeHub').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'block';
+            sessionStorage.setItem('dashboardLaunched', 'true');
+        }
+        // Auto-launch if already done in this session
+        if (sessionStorage.getItem('dashboardLaunched') === 'true') {
+            document.addEventListener('DOMContentLoaded', function() {
+                launchDashboard();
+            });
+        }
+    </script>
+    {% if user.is_student %}
+    <!-- STUDENT PREMIUM DASHBOARD -->
+    <div style="margin-bottom: 1.5rem; border-radius: 20px; background: linear-gradient(135deg, #0f172a, #1e293b); padding: 1.5rem 2rem; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; overflow: hidden; display: flex; align-items: center; gap: 1.5rem;">
+
+        <!-- Avatar -->
+        <div style="position: relative; flex-shrink: 0;">
+            {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="Profile" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            {% else %}
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: #6366f1; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: 800; color: white;">
+
+                    {{ user.first_name|make_list|first|upper }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="z-index: 1;">
+            <p style="margin: 0; font-size: 0.9rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Academic Overview</p>
+            <h1 style="margin: 0; color: #fff; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2;">
+
+                {% if now.hour < 12 %}Good Morning,{% elif now.hour < 18 %}Good Afternoon,{% else %}Good Evening,{% endif %} 
+                <span style="color: #6366f1;">{{ user.first_name }}</span> 👋
+            </h1>
+            
+            <div style="display: flex; gap: 0.8rem; margin-top: 1.5rem;">
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 0.5rem 1rem; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #cbd5e1;">
+                    <i class="fa-solid fa-graduation-cap"></i> Year {{ user.year_of_study }}
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 0.5rem 1rem; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #cbd5e1;">
+                    <i class="fa-solid fa-building"></i> {{ user.department }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI STATS -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+
+        <div class="kpi-card" style="border-left-color: #6366f1;">
+            <div class="kpi-icon" style="color: #6366f1; background: #eef2ff;"><i class="fa-solid fa-book-open-reader"></i></div>
+            <div class="kpi-content">
+                <span class="kpi-label">Total Exams Taken</span>
+                <span class="kpi-value">{{ kpi_total_attempted }}</span>
+            </div>
+        </div>
+        <div class="kpi-card" style="border-left-color: #10b981;">
+            <div class="kpi-icon" style="color: #10b981; background: #ecfdf5;"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="kpi-content">
+                <span class="kpi-label">Exams Passed</span>
+                <span class="kpi-value">{{ kpi_passed_count }}</span>
+            </div>
+        </div>
+        <div class="kpi-card" style="border-left-color: #0ea5e9;">
+            <div class="kpi-icon" style="color: #0ea5e9; background: #f0f9ff;"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="kpi-content">
+                <span class="kpi-label">Average Performance</span>
+                <span class="kpi-value">{{ kpi_avg_score|floatformat:0 }}%</span>
+                <span style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-top: 0.2rem;">Avg. Score: {{ kpi_avg_raw|floatformat:0 }} / {{ kpi_max_avg|floatformat:0 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .filter-pill {
+            background: #f8fafc; color: #64748b; padding: 0.6rem 1.4rem; border-radius: 14px; 
+            font-weight: 700; font-size: 0.85rem; transition: all 0.2s ease;
+            border: 2px solid #f1f5f9; white-space: nowrap; cursor: pointer;
+        }
+        .filter-pill:hover { border-color: #6366f1; color: #6366f1; background: #f5f3ff; }
+        .filter-pill.active { background: #6366f1; color: white; border-color: #6366f1; }
+        
+        .exam-card { 
+            background: white; border: 1.5px solid #f1f5f9; border-radius: 20px; padding: 1.2rem; 
+            margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; 
+            transition: all 0.3s ease; 
+        }
+        .exam-card:hover { transform: translateX(5px); border-color: #22c55e; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
+        
+        .btn-take-exam {
+            background: #22c55e; color: white; border: none; font-weight: 800; font-size: 0.8rem;
+            padding: 0.6rem 1.5rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+            text-decoration: none; transition: all 0.2s;
+        }
+        .btn-take-exam:hover { background: #16a34a; transform: scale(1.05); }
+
+        @keyframes micro-pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .live-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: micro-pulse 2s infinite; }
+    </style>
+
+    <!-- SUBJECTS FILTER BAR (JS POWERED) -->
+    <div style="margin-bottom: 2.5rem; background: white; padding: 1.5rem; border-radius: 24px; border: 1.5px solid #f1f5f9;">
+        <h3 style="font-weight: 800; font-size: 1rem; color: #1e293b; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem;">
+            <i class="fa-solid fa-book-bookmark" style="color: #6366f1;"></i> My Subjects
+        </h3>
+        <div style="display: flex; gap: 0.8rem; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none;">
+            <div class="filter-pill active" onclick="filterExams('all', this)">All Courses</div>
+            {% for course in student_courses %}
+                <div class="filter-pill" onclick="filterExams('{{ course.id }}', this)">{{ course.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1.5rem; margin-bottom: 3rem;">
+        <!-- ACTIVE EXAMS -->
+        <div class="glass-panel" style="padding: 0; overflow: hidden; border-radius: 28px; border: 1.5px solid #f1f5f9;">
+            <div style="padding: 1.2rem 1.5rem; border-bottom: 1px solid #f1f5f9; background: #f0fdf4; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <div class="live-dot"></div>
+                    <h3 style="margin: 0; font-weight: 800; font-size: 0.95rem; color: #166534;">Ready to Take</h3>
+                </div>
+            </div>
+            <div style="padding: 1.5rem;" id="active-exam-container">
+                {% for exam in active_exams %}
+                <div class="exam-card" data-course="{{ exam.course.id }}">
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div style="background: #f0fdf4; color: #22c55e; width: 40px; height: 40px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 1.1rem;">
+                            <i class="fa-solid fa-file-lines"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; font-size: 0.95rem; color: #1e293b;">{{ exam.title }}</strong>
+                            <span style="font-size: 0.75rem; font-weight: 700; color: #94a3b8;">
+                                <i class="fa-solid fa-user-graduate"></i> Prof. {{ exam.teacher.last_name|default:exam.teacher.username }} • {{ exam.duration_minutes }}m
+                                {% if exam.is_reattempt %}
+                                    <span style="color: #ef4444; margin-left: 0.5rem; font-weight: 900;">• RE-ATTEMPT</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <a href="{% url 'take_exam' exam.pk %}" class="btn-take-exam">Enter</a>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 3rem 1rem; color: #94a3b8; font-weight: 600; font-size: 0.85rem;">No active exams found.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- UPCOMING EXAMS -->
+        <div class="glass-panel" style="padding: 0; overflow: hidden; border-radius: 28px; border: 1.5px solid #f1f5f9;">
+            <div style="padding: 1.2rem 1.5rem; border-bottom: 1px solid #f1f5f9; background: #fffbeb;">
+                <h3 style="margin: 0; font-weight: 800; font-size: 0.95rem; color: #92400e;">Upcoming Sessions</h3>
+            </div>
+            <div style="padding: 1.5rem;" id="upcoming-exam-container">
+                {% for exam in upcoming_exams %}
+                <div class="exam-card" data-course="{{ exam.course.id }}" style="border-color: #fef3c7;">
+                    <div>
+                        <strong style="display: block; font-size: 0.9rem; color: #1e293b;">{{ exam.title }}</strong>
+                        <span style="font-size: 0.75rem; color: #d97706; font-weight: 800;">Starts: {{ exam.scheduled_date|date:"M d, H:i" }}</span>
+                    </div>
+                    <span style="background: #fef3c7; color: #92400e; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.65rem; font-weight: 800;">LOCKED</span>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 3rem 1rem; color: #94a3b8; font-weight: 600; font-size: 0.85rem;">No future sessions scheduled.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterExams(courseId, el) {
+            // Update UI pills
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+
+            // Filter Active Exams
+            const activeCards = document.querySelectorAll('#active-exam-container .exam-card');
+            let activeCount = 0;
+            activeCards.forEach(card => {
+                if (courseId === 'all' || card.getAttribute('data-course') === courseId) {
+                    card.style.display = 'flex';
+                    activeCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Filter Upcoming Exams
+            const upcomingCards = document.querySelectorAll('#upcoming-exam-container .exam-card');
+            upcomingCards.forEach(card => {
+                if (courseId === 'all' || card.getAttribute('data-course') === courseId) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+    <!-- ACADEMIC TRANSCRIPT (COMPACT VIEW) -->
+    <div class="glass-panel" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1.5px solid #f1f5f9;">
+        <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; background: #fafafa; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-weight: 800; font-size: 0.9rem; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px;">Academic Transcript</h3>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #64748b;">Recent Submissions</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: #fcfcfc; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; z-index: 10;">
+                    <tr style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; font-weight: 800;">
+                        <th style="padding: 0.8rem 1.5rem;">Date</th>
+                        <th style="padding: 0.8rem 1.5rem;">Assessment Details</th>
+                        <th style="padding: 0.8rem 1.5rem;">Score</th>
+                        <th style="padding: 0.8rem 1.5rem;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in past_results %}
+                    <tr class="table-row-hover" style="border-bottom: 1px solid #f8fafc;">
+                        <td style="padding: 1rem 1.5rem; font-size: 0.8rem; color: #64748b; font-weight: 600;">{{ res.completed_at|date:"d M, Y" }}</td>
+                        <td style="padding: 1rem 1.5rem;">
+                            <strong style="display: block; font-size: 0.9rem; color: #1e293b; margin-bottom: 0.1rem;">{{ res.exam.title }}</strong>
+                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">{{ res.exam.course.name }}</span>
+                        </td>
+                        <td style="padding: 1rem 1.5rem;">
+                            <strong style="color: #1e293b; font-size: 0.9rem;">{{ res.score|floatformat:2 }}</strong> <span style="color: #94a3b8; font-size: 0.75rem;">/ {{ res.attempt_total_marks }}</span>
+                        </td>
+                        <td style="padding: 1rem 1.5rem;">
+                            {% if res.is_pass or res.exam_passed_overall %}
+                                <span style="background: #f0fdf4; color: #166534; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.7rem; font-weight: 800; border: 1px solid #bbf7d0;">PASS</span>
+                            {% else %}
+                                <span style="background: #fef2f2; color: #991b1b; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.7rem; font-weight: 800; border: 1px solid #fecaca;">FAIL</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" style="padding: 3rem; text-align: center; color: #94a3b8; font-size: 0.85rem;">No historical records found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- STATS REFRESH: 2026-04-24T10:37:00 -->
+    <style>
+        .kpi-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
+            border-left: 6px solid;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }
+        .kpi-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.05);
+        }
+        .kpi-label { display: block; font-size: 0.8rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.4rem; }
+        .kpi-value { display: block; font-size: 1.8rem; font-weight: 950; color: #1e293b; letter-spacing: -1px; line-height: 1; }
+
+
+
+        
+        .filter-pill {
+            background: #fff;
+            border: 1.5px solid #f1f5f9;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .filter-pill.active { background: #4f46e5; color: white; border-color: #4f46e5; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2); }
+        .filter-pill:hover:not(.active) { background: #f8fafc; border-color: #cbd5e1; }
+        
+        .btn-take-exam {
+            background: #4f46e5;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+        .btn-take-exam:hover { background: #4338ca; transform: scale(1.05); }
+        
+        .table-row-hover:hover { background: #fcfdff; }
+        
+        .badge-status {
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .badge-status.pass { background: #ecfdf5; color: #059669; }
+        .badge-status.fail { background: #fef2f2; color: #dc2626; }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .btn-action-hub {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            border: 1.5px solid transparent;
+        }
+        .btn-action-hub.setup { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
+        .btn-action-hub.setup:hover { border-color: #6366f1; color: #6366f1; background: white; }
+        
+        .btn-action-hub.analytics { background: #f0fdf4; border-color: #dcfce7; color: #166534; }
+        .btn-action-hub.analytics:hover { border-color: #10b981; background: white; }
+
+        .btn-action-hub.delete { background: #fef2f2; border-color: #fecaca; color: #dc2626; cursor: pointer; }
+        .btn-action-hub.delete:hover { border-color: #ef4444; background: white; color: #ef4444; }
+
+        /* EXECUTIVE STYLES */
+
+
+    </style>
+
+    {% else %}
+    <!-- Generic/Admin -->
+    <div style="text-align: center; padding: 5rem;">
+        <h2 style="font-size: 3rem; font-weight: 900; color: #1e293b;">Administrator Terminal</h2>
+        <a href="/admin/" class="btn btn-primary" style="margin-top: 2rem; padding: 1rem 3rem;">Access Backend</a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

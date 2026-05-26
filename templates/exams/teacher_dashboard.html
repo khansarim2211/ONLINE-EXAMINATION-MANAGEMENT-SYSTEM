@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .btn-action-hub {
+        text-decoration: none;
+        padding: 0.7rem 0.7rem;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        width: 42px;
+        height: 42px;
+    }
+    .btn-action-hub.setup { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
+    .btn-action-hub.setup:hover { border-color: #6366f1; color: #6366f1; background: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1); }
+    .btn-action-hub.analytics { background: #f0fdf4; border-color: #dcfce7; color: #166534; }
+    .btn-action-hub.analytics:hover { border-color: #10b981; background: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.1); }
+    .btn-action-hub.edit { background: #fffbeb; border-color: #fef3c7; color: #d97706; }
+    .btn-action-hub.edit:hover { border-color: #f59e0b; background: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(245, 158, 11, 0.1); }
+    .btn-action-hub.delete { background: #fff1f2; border-color: #fee2e2; color: #991b1b; }
+    .btn-action-hub.delete:hover { border-color: #ef4444; background: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.1); }
+    .stat-card-premium {
+        background: white; border-radius: 28px; padding: 2rem; display: flex; align-items: center; gap: 1.5rem; 
+        box-shadow: 0 10px 40px -10px rgba(0,0,0,0.06); border: 1.5px solid #f1f5f9;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .stat-card-premium:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.12); }
+    .status-badge {
+        padding: 0.5rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        border: 1.5px solid transparent;
+    }
+</style>
+<div style="width: 100%;">
+    <!-- EXECUTIVE HERO SECTION -->
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 35px; padding: 3rem; color: white; box-shadow: 0 25px 60px -20px rgba(15, 23, 42, 0.4); position: relative; overflow: hidden; margin-bottom: 3rem;">
+        <div style="position: absolute; top: -100px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);"></div>
+        <div style="position: absolute; bottom: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10;">
+            <div style="display: flex; align-items: center; gap: 3rem;">
+                <div style="position: relative;">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" style="width: 130px; height: 130px; border-radius: 40px; object-fit: cover; border: 5px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+                    {% else %}
+                        <div style="width: 130px; height: 130px; border-radius: 40px; background: linear-gradient(135deg, #4f46e5, #6366f1); display: flex; justify-content: center; align-items: center; color: white; font-size: 4.5rem; font-weight: 900; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">{{ user.first_name|first|upper }}</div>
+                    {% endif %}
+                    <div style="position: absolute; bottom: -8px; right: -8px; width: 42px; height: 42px; background: #10b981; border-radius: 14px; border: 4px solid #0f172a; display: flex; justify-content: center; align-items: center; color: white;">
+                        <i class="fa-solid fa-check" style="font-size: 1.1rem;"></i>
+                    </div>
+                </div>
+                <div>
+                    <span style="font-size: 0.9rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 0.8rem; display: block;">Authorized Instructor</span>
+                    <h1 style="font-size: 3rem; font-weight: 950; margin: 0; letter-spacing: -2px; line-height: 1.1;">Welcome back, {{ user.first_name|default:user.username }}</h1>
+                    <p style="color: #64748b; font-size: 1.2rem; font-weight: 600; margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
+                        <i class="fa-solid fa-university" style="color: #4f46e5;"></i> {{ user.department|default:"General Academic Faculty" }} 
+                        <span style="opacity: 0.3;">|</span> 
+                        <i class="fa-solid fa-calendar-day"></i> {{ now|date:"l, F d, Y" }}
+                    </p>
+                </div>
+            </div>
+            <a href="{% url 'create_exam' %}" style="background: white; color: #1e293b; padding: 1.4rem 2.8rem; border-radius: 24px; font-weight: 950; text-decoration: none; font-size: 1.15rem; display: inline-flex; align-items: center; gap: 1rem; box-shadow: 0 25px 50px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 30px 60px rgba(0,0,0,0.25)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 25px 50px rgba(0,0,0,0.2)'">
+                <i class="fa-solid fa-plus-circle" style="color: #4f46e5; font-size: 1.4rem;"></i> New Examination
+            </a>
+        </div>
+    </div>
+    <!-- STATISTICAL GRID -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 4rem;">
+        <div class="stat-card-premium" style="border-bottom: 5px solid #6366f1;">
+            <div style="background: #f5f3ff; color: #6366f1; width: 68px; height: 68px; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem;"><i class="fa-solid fa-layer-group"></i></div>
+            <div><span style="color: #94a3b8; font-size: 0.8rem; font-weight: 850; text-transform: uppercase; letter-spacing: 1px;">Authorizations</span><div style="font-size: 2.4rem; font-weight: 950; color: #1e293b; line-height: 1;">{{ kpi_total_exams }}</div></div>
+        </div>
+        <div class="stat-card-premium" style="border-bottom: 5px solid #10b981;">
+            <div style="background: #ecfdf5; color: #10b981; width: 68px; height: 68px; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem;"><i class="fa-solid fa-users"></i></div>
+            <div><span style="color: #94a3b8; font-size: 0.8rem; font-weight: 850; text-transform: uppercase; letter-spacing: 1px;">Engagement</span><div style="font-size: 2.4rem; font-weight: 950; color: #1e293b; line-height: 1;">{{ kpi_total_students }}</div></div>
+        </div>
+        <div class="stat-card-premium" style="border-bottom: 5px solid #f59e0b;">
+            <div style="background: #fffbeb; color: #f59e0b; width: 68px; height: 68px; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem;"><i class="fa-solid fa-check-double"></i></div>
+            <div><span style="color: #94a3b8; font-size: 0.8rem; font-weight: 850; text-transform: uppercase; letter-spacing: 1px;">Published</span><div style="font-size: 2.4rem; font-weight: 950; color: #1e293b; line-height: 1;">{{ kpi_results_published }}</div></div>
+        </div>
+        <div class="stat-card-premium" style="border-bottom: 5px solid #0ea5e9;">
+            <div style="background: #f0f9ff; color: #0ea5e9; width: 68px; height: 68px; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem;"><i class="fa-solid fa-bolt-lightning"></i></div>
+            <div><span style="color: #94a3b8; font-size: 0.8rem; font-weight: 850; text-transform: uppercase; letter-spacing: 1px;">Accuracy</span><div style="font-size: 2.4rem; font-weight: 950; color: #1e293b; line-height: 1;">84.2%</div></div>
+        </div>
+    </div>
+    <!-- EXAMINATION PORTFOLIO - FULL WIDTH STACKED -->
+    <div style="background: white; border-radius: 40px; border: 1.5px solid #f1f5f9; box-shadow: 0 20px 60px rgba(0,0,0,0.04); margin-bottom: 4rem; overflow: hidden;">
+        <div style="padding: 2.5rem 3.5rem; background: #fcfcfc; border-bottom: 1.5px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin: 0; font-weight: 950; font-size: 1.6rem; color: #1e293b; letter-spacing: -1px;">Examination Portfolio</h3>
+                <p style="margin: 0.5rem 0 0 0; color: #94a3b8; font-size: 1rem; font-weight: 600;">Full command over your active and scheduled academic assessments.</p>
+            </div>
+            <div style="position: relative;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                <input type="text" id="examSearchInput" onkeyup="filterExams()" placeholder="Search Index..." style="background: #f1f5f9; padding: 0.8rem 1.5rem 0.8rem 3rem; border-radius: 16px; font-size: 0.9rem; font-weight: 800; color: #475569; border: 1.5px solid #e2e8f0; width: 250px; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#6366f1'; this.style.background='white'; this.style.width='300px';">
+            </div>
+        </div>
+        <div style="overflow-x: auto;">
+            <table id="examPortfolioTable" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #fcfcfc; border-bottom: 1.5px solid #f1f5f9; text-align: left;">
+                        <th style="padding: 1.8rem 3.5rem; font-size: 0.8rem; font-weight: 850; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px;">Identity / Title</th>
+                        <th style="padding: 1.8rem 1rem; font-size: 0.8rem; font-weight: 850; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Config</th>
+                        <th style="padding: 1.8rem 1rem; font-size: 0.8rem; font-weight: 850; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Re-attempts</th>
+                        <th style="padding: 1.8rem 1rem; font-size: 0.8rem; font-weight: 850; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Live Status</th>
+                        <th style="padding: 1.8rem 3.5rem; font-size: 0.8rem; font-weight: 850; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; text-align: right;">Command Hub</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in teacher_exams %}
+                    <tr style="border-bottom: 1.5px solid #f8fafc; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.background='#fcfdff'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 2.5rem 3.5rem;">
+                            <div style="display: flex; align-items: center; gap: 1.8rem;">
+                                <div style="width: 60px; height: 60px; border-radius: 20px; background: #f8fafc; border: 2.5px solid #e2e8f0; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; color: #4f46e5; box-shadow: inset 0 4px 8px rgba(0,0,0,0.03);">
+                                    <i class="fa-solid fa-file-shield"></i>
+                                </div>
+                                <div>
+                                    <strong style="display: block; font-size: 1.3rem; color: #1e293b; letter-spacing: -0.8px; margin-bottom: 0.4rem;">{{ exam.title }}</strong>
+                                    <span style="font-size: 0.95rem; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 0.3rem 0.8rem; border-radius: 8px;">{{ exam.course.name }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 2.5rem 1rem; text-align: center;">
+                            <div style="display: inline-flex; background: #f8fafc; color: #1e293b; padding: 0.6rem 1.4rem; border-radius: 12px; font-weight: 900; font-size: 0.95rem; border: 1.5px solid #f1f5f9; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                                {{ exam.random_question_count|default:"All" }} Qs
+                            </div>
+                        </td>
+                        <td style="padding: 2.5rem 1rem; text-align: center;">
+                            {% if exam.allow_reattempt %}
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
+                                    <span style="color: #059669; font-weight: 950; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-circle-check"></i> ENABLED</span>
+                                </div>
+                            {% else %}
+                                <span style="color: #cbd5e1; font-weight: 900; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-circle-xmark"></i> DISABLED</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 2.5rem 1rem; text-align: center;">
+                            {% if exam.scheduled_date > now %}
+                                <span class="status-badge" style="background: #fffbeb; color: #d97706; border-color: #fef3c7;">SCHEDULED</span>
+                            {% else %}
+                                <span class="status-badge" style="background: #f0fdf4; color: #16a34a; border-color: #dcfce7;">ACTIVE</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 2.5rem 3.5rem;">
+                            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                                <a href="{% url 'exam_detail' exam.pk %}" class="btn-action-hub setup" title="Manage Assessment">
+                                    <i class="fa-solid fa-sliders"></i>
+                                </a>
+                                <a href="{% url 'edit_exam' exam.pk %}" class="btn-action-hub edit" title="Edit Assessment">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a href="{% url 'view_exam_results' exam.pk %}" class="btn-action-hub analytics" title="Performance Insights">
+                                    <i class="fa-solid fa-chart-bar"></i>
+                                </a>
+                                <form action="{% url 'delete_exam' exam.pk %}" method="post" onsubmit="return confirm('CRITICAL ACTION: This will permanently purge this examination and all candidate results. Proceed?');" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-action-hub delete" title="Purge Examination">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="padding: 10rem; text-align: center; color: #cbd5e1; font-weight: 800; font-size: 1.3rem;">No examinations discovered in your portfolio index.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- SUBMISSION INTEGRITY & SYSTEM ANALYTICS - NOW BELOW PORTFOLIO -->
+    <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 4rem; margin-bottom: 6rem;">
+        <!-- ENGAGEMENT ANALYTICS -->
+        <div style="background: white; border-radius: 45px; padding: 3.5rem; box-shadow: 0 25px 70px rgba(0,0,0,0.04); border: 2px solid #f1f5f9;">
+            <div style="margin-bottom: 3.5rem;">
+                <h3 style="font-weight: 950; font-size: 1.7rem; color: #1e293b; margin-bottom: 0.6rem; letter-spacing: -1px;">Submission Integrity</h3>
+                <p style="color: #94a3b8; font-size: 1.05rem; font-weight: 600;">Granular distribution of student engagement across your academic assessments.</p>
+            </div>
+            <div style="height: 420px; position: relative;">
+                <canvas id="engagementChart"></canvas>
+            </div>
+        </div>
+        <!-- INFRASTRUCTURE STATUS -->
+        <div style="display: flex; flex-direction: column; gap: 2.5rem;">
+            <div style="background: #f8fafc; border-radius: 40px; padding: 3rem; border: 3px dashed #cbd5e1; box-shadow: inset 0 0 20px rgba(0,0,0,0.01);">
+                <h4 style="font-size: 0.95rem; font-weight: 950; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2.5rem;">Security Engine Status</h4>
+                <div style="display: flex; flex-direction: column; gap: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);"></div>
+                        <span style="font-size: 1.1rem; font-weight: 800; color: #334155;">Anti-Cheat Engine: OPTIMAL</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);"></div>
+                        <span style="font-size: 1.1rem; font-weight: 800; color: #334155;">Proctoring Cluster: SYNCED</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <div style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);"></div>
+                        <span style="font-size: 1.1rem; font-weight: 800; color: #334155;">Auto-Grading API: LIVE</span>
+                    </div>
+                </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); border-radius: 40px; padding: 3rem; color: white; box-shadow: 0 30px 60px rgba(79, 70, 229, 0.3);">
+                <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-bottom: 2rem; font-size: 1.5rem;">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h4 style="font-size: 1.2rem; font-weight: 950; margin-bottom: 1rem;">Faculty Priority Support</h4>
+                <p style="font-size: 0.95rem; font-weight: 500; opacity: 0.85; line-height: 1.7; margin-bottom: 2rem;">Experiencing issues with complex question types or dynamic marking? Our priority support team is available 24/7 for instructors.</p>
+                <a href="mailto:support@examify.com?subject=Faculty%20Priority%20Support%20Request&body=Hello%20Support%20Team,%0A%0AI%20am%20logged%20in%20as%20{{ user.username }}%20and%20require%20assistance%20with..." style="background: white; color: #4338ca; text-decoration: none; padding: 1rem 2rem; border-radius: 15px; font-weight: 900; font-size: 0.9rem; display: inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">Contact Expert Support</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Chart.js and Analytics Logic -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function filterExams() {
+        const input = document.getElementById('examSearchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('examPortfolioTable');
+        const tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) {
+            const td = tr[i].getElementsByTagName('td')[0];
+            if (td) {
+                const textValue = td.textContent || td.innerText;
+                if (textValue.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('engagementChart').getContext('2d');
+        const labels = JSON.parse('{{ chart_labels|safe }}');
+        const data = JSON.parse('{{ chart_data|safe }}');
+        if (data && data.length > 0) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#0ea5e9'],
+                        borderWidth: 0,
+                        hoverOffset: 35
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 35,
+                                font: { weight: '850', size: 13, family: "'Inter', sans-serif" },
+                                color: '#475569'
+                            }
+                        }
+                    },
+                    cutout: '80%'
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

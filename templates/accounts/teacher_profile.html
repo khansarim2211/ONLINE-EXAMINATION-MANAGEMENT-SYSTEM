@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="min-height: 80vh; padding: 2rem 1rem; display: flex; justify-content: center; align-items: flex-start; background: transparent;">
+    <div style="width: 100%; max-width: 700px; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); padding: 2.5rem; border: 1px solid #f1f5f9; position: relative;">
+        
+        <!-- HEADER -->
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <h1 style="font-size: 2rem; font-weight: 800; color: #4f46e5; letter-spacing: -0.5px; margin-bottom: 0.5rem;">My Profile</h1>
+            <p style="color: #64748b; font-size: 0.95rem; font-weight: 500;">Manage your personal information and academic details</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- PROFILE IMAGE SECTION -->
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <div style="position: relative; width: 140px; height: 140px; margin: 0 auto 1.5rem auto;">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.08);">
+                    {% else %}
+                        <div style="width: 100%; height: 100%; border-radius: 50%; background: #f1f5f9; display: flex; justify-content: center; align-items: center; font-size: 3rem; font-weight: 800; color: #cbd5e1; border: 4px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.08);">
+                            {{ user.first_name|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <label for="{{ form.profile_image.id_for_label }}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #475569; padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: 1.5px solid #e2e8f0; transition: all 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                    <i class="fa-solid fa-camera"></i> Change Photo
+                </label>
+                <div style="display: none;">{{ form.profile_image }}</div>
+            </div>
+
+            <!-- FORM FIELDS GRID -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                {% for field in form %}
+                    {% if field.name != 'profile_image' %}
+                        <div class="form-group" style="{% if field.name == 'email' or field.name == 'subjects' %}grid-column: 1 / -1;{% endif %}">
+                            <label style="display: block; margin-bottom: 0.6rem; font-weight: 700; color: #475569; font-size: 0.8rem; text-transform: capitalize;">
+                                {% if field.name == 'email' %}Email Address{% else %}{{ field.label }}{% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div style="color: #ef4444; font-size: 0.75rem; margin-top: 0.4rem; font-weight: 600;">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div style="margin-top: 3.5rem; text-align: center;">
+                <button type="submit" style="background: #4f46e5; color: white; border: none; padding: 1rem 3rem; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.15); display: inline-flex; align-items: center; gap: 0.8rem;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        background: #fcfdfe;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #1e293b;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #4f46e5;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.05);
+    }
+    
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+</style>
+{% endblock %}

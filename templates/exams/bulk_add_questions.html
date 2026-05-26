@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 2rem auto 4rem;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+        <div>
+            <h2 style="color: #4338ca; font-size: 1.5rem; font-weight: 850; letter-spacing: -0.5px; margin: 0;">Setup Exam: <span style="opacity: 0.7;">{{ exam.title }}</span></h2>
+
+        </div>
+        <a href="{% url 'exam_detail' exam.pk %}" class="btn-back-setup">
+            ← Back to Setup
+        </a>
+    </div>
+
+    <!-- UI Tabs -->
+    <div style="display: flex; gap: 1.5rem; border-bottom: 1px solid #f1f5f9; margin-bottom: 2rem;">
+
+        <button onclick="switchTab('fast')" id="tab-fast" class="tab-btn active">
+            <i class="fa-solid fa-bolt-lightning"></i> Fast Paste AI Mode
+        </button>
+        <button onclick="switchTab('builder')" id="tab-builder" class="tab-btn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Visual Builder
+        </button>
+    </div>
+
+    <!-- TAB 1: Fast Paste (Aiken Format) -->
+    <div id="section-fast" class="tab-content active">
+        <div class="info-alert">
+            <p style="margin-bottom: 0.75rem;"><strong>Fastest way to add questions!</strong> Just copy-paste your text. Format rules:</p>
+            <ul style="font-size: 0.95rem; color: #6366f1; font-weight: 600; margin: 0; list-style-type: none; padding-left: 0;">
+                <li>• Change logic sections by typing <code>[SECTION: Name]</code></li>
+                <li>• Set custom marks per question by writing <code>MARKS: 2</code> (Defaults to 1)</li>
+                <li>• Write choices as <code>A. Text</code> or <code>B) Text</code></li>
+                <li>• Specify correct choice at the end using <code>ANSWER: B</code></li>
+            </ul>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <textarea name="raw_questions_text" rows="18" class="raw-textarea" 
+                placeholder="[SECTION: Aptitude]&#10;MARKS: 2&#10;What is the derivative of x^2?&#10;A) 2x&#10;B) x&#10;C) 2&#10;D) 0&#10;ANSWER: A"></textarea>
+
+            <button type="submit" class="btn-process">
+                <i class="fa-solid fa-rocket"></i> Process & Add Questions
+            </button>
+        </form>
+    </div>
+
+    <!-- TAB 2: Visual Builder -->
+    <div id="section-builder" class="tab-content" style="display: none;">
+        <p style="color: #64748b; font-weight: 600; margin-bottom: 2rem; font-size: 1.1rem;">Fill out the fields below. Click "Add Another" to append more questions, and "Save All Questions" when you are done.</p>
+
+        <div id="questions-container">
+            <!-- JS will render questions here -->
+        </div>
+
+        <div style="display: flex; gap: 1.5rem; margin-top: 3rem; border-top: 1.5px solid #f1f5f9; padding-top: 2.5rem;">
+            <button type="button" class="btn-builder-action add" onclick="addQuestionUI()">+ Add Another Question</button>
+            <button type="button" class="btn-builder-action save" onclick="submitBulk()">Save All Questions</button>
+        </div>
+
+        <form id="bulk-form" method="POST" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="questions_json" id="questions_json">
+        </form>
+    </div>
+</div>
+
+<style>
+    .btn-back-setup {
+        background: white;
+        color: #475569;
+        padding: 0.7rem 1.4rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        border: 1.5px solid #e2e8f0;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+    .btn-back-setup:hover { border-color: #4338ca; color: #4338ca; }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 1rem 0;
+        font-weight: 800;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 0.95rem;
+
+        position: relative;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    .tab-btn.active { color: #4338ca; }
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: #4338ca;
+        border-radius: 10px;
+    }
+
+    .info-alert {
+        background: #f5f3ff;
+        border-left: 5px solid #8b5cf6;
+        padding: 1.2rem;
+
+        border-radius: 12px;
+
+        margin-bottom: 2.5rem;
+        color: #4338ca;
+        font-weight: 600;
+    }
+
+    .raw-textarea {
+        width: 100%;
+        border: 2px solid #f1f5f9;
+        border-radius: 12px;
+
+        padding: 1.2rem;
+
+        font-family: 'Fira Code', monospace;
+        font-size: 1rem;
+        background: #fcfcfc;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+    .raw-textarea:focus { border-color: #6366f1; background: white; outline: none; box-shadow: 0 10px 40px rgba(99, 102, 241, 0.05); }
+
+    .btn-process {
+        margin-top: 2rem;
+        width: 100%;
+        background: linear-gradient(135deg, #4f46e5, #4338ca);
+        color: white;
+        border: none;
+        padding: 0.8rem;
+
+        border-radius: 12px;
+
+        font-size: 0.95rem;
+
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.2);
+    }
+    .btn-process:hover { transform: translateY(-3px); box-shadow: 0 20px 45px rgba(79, 70, 229, 0.3); }
+
+    .builder-q-card {
+        background: white;
+        border: 2px solid #f1f5f9;
+        padding: 1.5rem;
+
+        border-radius: 16px;
+
+        margin-bottom: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        transition: all 0.3s;
+    }
+    .builder-q-card:hover { border-color: #e2e8f0; transform: translateY(-5px); }
+
+    .form-group label {
+        display: block;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 0.6rem;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .form-control {
+        background: #f8fafc;
+        border: 2px solid #f1f5f9;
+        border-radius: 12px;
+        padding: 0.8rem 1.2rem;
+        width: 100%;
+        box-sizing: border-box;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+    .form-control:focus { border-color: #6366f1; outline: none; background: white; }
+
+    .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+    .choice-box { background: #f8fafc; padding: 1.5rem; border: 1.5px solid #f1f5f9; border-radius: 20px; transition: all 0.2s; }
+    .choice-box:focus-within { border-color: #6366f1; background: white; }
+
+    .btn-builder-action {
+        flex: 1;
+        padding: 1.2rem;
+        border-radius: 18px;
+        font-size: 0.95rem;
+
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+    .btn-builder-action.add { background: white; border: 2.5px solid #e2e8f0; color: #475569; }
+    .btn-builder-action.add:hover { border-color: #4338ca; color: #4338ca; }
+    
+    .btn-builder-action.save { background: #4338ca; color: white; box-shadow: 0 10px 25px rgba(67, 56, 202, 0.3); }
+    .btn-builder-action.save:hover { filter: brightness(1.1); transform: translateY(-2px); }
+</style>
+
+<script>
+    function switchTab(tab) {
+        document.getElementById('section-fast').style.display = (tab === 'fast') ? 'block' : 'none';
+        document.getElementById('section-builder').style.display = (tab === 'builder') ? 'block' : 'none';
+        
+        document.getElementById('tab-fast').classList.toggle('active', tab === 'fast');
+        document.getElementById('tab-builder').classList.toggle('active', tab === 'builder');
+    }
+
+    let qCount = 0;
+    function addQuestionUI() {
+        qCount++;
+        const container = document.getElementById('questions-container');
+        const qDiv = document.createElement('div');
+        qDiv.className = "builder-q-card qbox";
+        qDiv.id = `qbox_${qCount}`;
+
+        qDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 1rem;">
+
+                <h4 style="margin: 0; color: #4338ca; font-weight: 850; font-size: 1.1rem;">Question ${qCount}</h4>
+
+                <button type="button" onclick="document.getElementById('qbox_${qCount}').remove()" style="background: #fef2f2; border: none; color: #dc2626; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 0.85rem;">✕ Remove</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label>Section Name</label>
+                    <input type="text" class="q-section form-control" value="General">
+                </div>
+                <div class="form-group">
+                    <label>Marks</label>
+                    <input type="number" class="q-marks form-control" value="1" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Question Text <span style="color: #ef4444;">*</span></label>
+                <textarea class="q-text form-control" rows="3" required placeholder="What is the output of..."></textarea>
+            </div>
+            
+            <div class="choice-grid">
+                ${[1, 2, 3, 4].map(idx => `
+                    <div class="choice-box">
+                        <label style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem; cursor: pointer; font-weight: 800; color: #475569; font-size: 0.85rem;">
+                            <input type="radio" name="q_${qCount}_correct" value="${idx}" ${idx === 1 ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: #10b981;">
+                            CHOICE ${idx} ${idx === 1 ? '<span style="color: #10b981;">(CORRECT)</span>' : ''}
+                        </label>
+                        <input type="text" class="q-choice form-control" data-idx="${idx}" required placeholder="Option text...">
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(qDiv);
+    }
+
+    function submitBulk() {
+        const boxes = document.querySelectorAll('.qbox');
+        if (boxes.length === 0) { alert("Add at least one question!"); return; }
+
+        let payload = [];
+        let hasError = false;
+
+        boxes.forEach((box, i) => {
+            let section = box.querySelector('.q-section').value;
+            let text = box.querySelector('.q-text').value;
+            let marks = box.querySelector('.q-marks').value;
+            if (!text) { alert(`Question ${i + 1} text is empty!`); hasError = true; }
+
+            let choices = [];
+            box.querySelectorAll('.q-choice').forEach(input => choices.push(input.value));
+            let correctChoice = box.querySelector('input[type="radio"]:checked').value;
+
+            payload.push({ section_name: section, text: text, marks: marks, choices: choices, correct_choice: correctChoice });
+        });
+
+        if (!hasError) {
+            document.getElementById('questions_json').value = JSON.stringify(payload);
+            document.getElementById('bulk-form').submit();
+        }
+    }
+
+    window.onload = () => addQuestionUI();
+</script>
+{% endblock %}
